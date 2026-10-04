@@ -340,3 +340,100 @@ footer.site a:hover { color: var(--accent-ink); text-decoration: underline; }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   v2 — ترقية جمالية: خطوط Fraunces/Inter · ظلال متدرجة · بطاقات
+   تدرّج دافئ · شرائح بنقاط · جداول مُغلّفة للجوال · تفاصيل صغيرة
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --paper: #fdfaf3;
+  --card: #f3ecdf;
+  --accent: #1f7a4d;
+  --accent-ink: #175a38;
+  --serif: "Fraunces", Charter, Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 14px;
+  --shadow-1: 0 1px 2px rgba(35, 30, 22, .04), 0 2px 4px rgba(35, 30, 22, .03), 0 4px 12px rgba(35, 30, 22, .04);
+  --shadow-2: 0 2px 4px rgba(35, 30, 22, .05), 0 8px 16px rgba(35, 30, 22, .06), 0 16px 40px rgba(35, 30, 22, .08);
+}
+body { font-size: clamp(16px, 0.55vw + 14.6px, 17.5px); line-height: 1.72; }
+main { overflow-x: clip; }
+
+/* البطل: تدرّج دافئ + نمط نقاط خفيف */
+.hero {
+  position: relative;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(31, 122, 77, .07), transparent 42%),
+    radial-gradient(circle at 100% 12%, rgba(180, 106, 27, .06), transparent 38%),
+    var(--white);
+  border-radius: 18px;
+  box-shadow: var(--shadow-2);
+  padding: clamp(22px, 4vw, 34px);
+  overflow: hidden;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -40px;
+  top: -40px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(31, 122, 77, .10), transparent 68%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero h1 { font-size: clamp(25px, 1.6vw + 19px, 34px); }
+p.lede { font-size: clamp(17px, 0.4vw + 15.6px, 19px); }
+
+/* شرائح بنقطة (وصولية لعمى الألوان) */
+.chip { font-weight: 500; padding: 5px 13px 5px 11px; display: inline-flex; align-items: center; gap: 7px; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+.chip.accent::before { background: var(--accent); }
+.chips .print-btn { margin-inline-start: auto; padding: 8px 18px; font-weight: 600; box-shadow: var(--shadow-1); }
+
+/* عناوين الأقسام: شريط تمييز صغير */
+.content h2 { position: relative; padding-inline-start: 14px; }
+.content h2::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.34em;
+  width: 5px;
+  height: 0.95em;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--accent), #2e9d63);
+}
+
+/* الجداول داخل مُغلّف أفقي (جوال) — ومنتج مصقول */
+.table-wrap { margin: 1.3em 0; border-radius: var(--radius); box-shadow: var(--shadow-1); }
+.table-wrap table { margin: 0; }
+.table-wrap th { position: sticky; top: 0; }
+.content .table-wrap { border: 1px solid var(--line); background: var(--white); }
+
+/* بطاقات ذات صلة والرئيسية: رفع أنعم */
+.related a.card { border-radius: var(--radius); padding: 16px 18px; }
+.related a.card .t { font-family: var(--serif); font-size: 16.5px; }
+ul.listing a.t { font-family: var(--serif); font-size: 19px; }
+ul.listing li { border-radius: var(--radius); padding: 18px 20px; }
+
+/* زر عائم بظل أعمق + مساحة أمان iOS */
+.float-print { padding: 12px 20px; font-weight: 600; box-shadow: var(--shadow-2); }
+@supports (padding: max(0px)) {
+  .float-print { bottom: max(20px, env(safe-area-inset-bottom)); inset-inline-end: max(20px, env(safe-area-inset-right)); }
+}
+
+/* روابط: انتقال ناعم وتسطير أنيق */
+.content a { text-decoration-thickness: 1px; text-underline-offset: 2px; transition: color .12s; }
+.content a:hover { color: var(--accent-ink); }
+
+/* خلفية الترويسة بعد الترقية */
+header.site { background: rgba(253, 250, 243, .9); }
+.brand { font-size: 21px; }
+
+/* الجوال: أهداف لمس أكبر */
+@media (max-width: 640px) {
+  nav.top a, footer.site a { padding: 8px 9px; }
+  .table-wrap { font-size: 0.86em; }
+  .hero { border-radius: 14px; }
+  .float-print { padding: 12px 18px; }
+}
