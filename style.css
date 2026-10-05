@@ -225,6 +225,11 @@ figcaption {
   margin-top: 8px;
 }
 .ad { margin: 1.6em 0; text-align: center; }
+.photo-credits {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0.8em 0 0;
+}
 .video {
   position: relative;
   padding-bottom: 56.25%;
