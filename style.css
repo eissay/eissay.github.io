@@ -442,3 +442,356 @@ header.site { background: rgba(253, 250, 243, .9); }
   .hero { border-radius: 14px; }
   .float-print { padding: 12px 18px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   v3 — تخطيط مجلة: عمودان + شريط جانبي مثبّت + أدوات مطبخ تفاعلية
+   (حاسبة تحويل · وضع الطبخ · أسئلة شائعة قابلة للفتح · بطاقات مصوّرة)
+   ═══════════════════════════════════════════════════════════════ */
+main { max-width: 1140px; padding: 0 22px 60px; }
+main.narrow { max-width: 800px; }
+header.site .bar, footer.site .bar { max-width: 1140px; }
+
+/* ── الشبكة: محتوى + شريط جانبي ── */
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 36px;
+  align-items: start;
+  padding-top: 26px;
+}
+.rail {
+  position: sticky;
+  top: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.rail-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-1);
+}
+.rail-card h3 {
+  margin: 0 0 10px;
+  font: 700 12.5px/1 var(--sans);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rail-card p { margin: 6px 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+.rail-card .tools { display: flex; flex-direction: column; gap: 8px; }
+.rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  text-align: start;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: 600 13.5px var(--sans);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.rail-btn:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+.rail-card table { font-size: 12.5px; box-shadow: none; margin: 4px 0 0; }
+.rail-card th, .rail-card td { padding: 6px 7px; }
+.rail-card .note { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.5; }
+.rail-card .links { display: flex; flex-wrap: wrap; gap: 7px; }
+.rail-card .links a {
+  font: 600 12.5px var(--sans);
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  padding: 5px 11px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid #cfe2d8;
+}
+.rail-card .links a:hover { background: #dcefe4; }
+
+/* ── مسار التنقل ── */
+.crumbs {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.crumbs a { color: var(--accent-ink); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs .sep { opacity: .45; }
+.crumbs .here { color: var(--muted); }
+
+/* ── أزرار المشاركة في شريط المعلومات ── */
+.chip-btn {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font: 600 13px var(--sans);
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip-btn:hover { border-color: var(--accent); color: var(--accent-ink); background: var(--accent-soft); }
+
+/* ── زر وضع الطبخ العائم (فوق زر الطباعة) ── */
+.float-cook {
+  position: fixed;
+  bottom: 84px;
+  inset-inline-end: 20px;
+  z-index: 50;
+  background: var(--amber);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 18px;
+  font: 600 14px var(--sans);
+  cursor: pointer;
+  box-shadow: var(--shadow-2);
+}
+.float-cook:hover { background: #96551a; }
+@supports (padding: max(0px)) {
+  .float-cook { bottom: calc(84px + env(safe-area-inset-bottom)); inset-inline-end: max(20px, env(safe-area-inset-right)); }
+}
+
+/* ── وضع الطبخ: غلاف بملء الشاشة بخط كبير ── */
+.cookmode { position: fixed; inset: 0; z-index: 90; background: var(--paper); overflow-y: auto; }
+.cookmode .cookbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #26221c;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  flex-wrap: wrap;
+}
+.cookmode .cookbar .title { font: 700 15px var(--sans); flex: 1; min-width: 130px; white-space: nowrap; }
+.cookmode .cookbar .progress { font: 600 13px var(--sans); opacity: .85; }
+.cookmode .cookbar button {
+  background: rgba(255, 255, 255, .13);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: 600 14px var(--sans);
+  cursor: pointer;
+}
+.cookmode .cookbar button:hover { background: rgba(255, 255, 255, .26); }
+.cookmode .cookbar button.primary { background: var(--accent); border-color: var(--accent); }
+.cookmode .cook-inner { max-width: 780px; margin: 0 auto; padding: 26px 22px 90px; }
+.cookmode .content { font-size: 20.5px; line-height: 1.85; }
+.cookmode .content h2 { font-size: 29px; scroll-margin-top: 66px; }
+.cookmode .content table { font-size: 1.02em; }
+.cookmode .content th, .cookmode .content td { padding: 12px 14px; }
+.cookmode .content .hero, .cookmode .content .toc, .cookmode .content .related,
+.cookmode .content .ad, .cookmode .content .crumbs { display: none; }
+.cookmode .cooknote { text-align: center; color: var(--muted); font-size: 13px; margin: 16px 0 0; }
+body.cooking { overflow: hidden; }
+
+/* ── حاسبة التحويل ── */
+.afconv {
+  background: linear-gradient(135deg, #fffdf9, #f4eee1);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-1);
+  margin: 24px 0;
+}
+.afconv-title { font: 700 21px/1.3 var(--serif); margin: 0 0 4px; }
+.afconv-sub { font-size: 14px; color: var(--muted); margin: 0 0 16px; }
+.afconv .fields { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
+.afconv label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font: 700 11.5px var(--sans);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.afconv .field { display: flex; gap: 6px; }
+.afconv input, .afconv select {
+  font: 600 16px var(--sans);
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 9px 10px;
+  width: 112px;
+}
+.afconv select { width: 76px; padding: 9px 6px; }
+.afconv input:focus-visible, .afconv select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.afconv .go {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font: 700 15px var(--sans);
+  cursor: pointer;
+}
+.afconv .go:hover { background: var(--accent-ink); }
+.afconv .out {
+  margin-top: 14px;
+  border-radius: 12px;
+  border: 1px solid #cfe2d8;
+  background: var(--accent-soft);
+  padding: 14px 16px;
+  font-size: 15px;
+}
+.afconv .out .big { font: 700 21px/1.45 var(--serif); color: var(--accent-ink); }
+.afconv .out .big b { color: var(--accent-ink); }
+.afconv .out .check { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 14px; }
+.afconv .out .warn { display: block; margin-top: 7px; color: #9a4a12; font-size: 13.5px; font-weight: 600; }
+.afconv .out .disclaim { display: block; margin-top: 9px; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.afconv .afconv-err { color: #9a4a12; font-weight: 600; margin: 12px 0 0; font-size: 14px; min-height: 1em; }
+
+/* ── بطاقات الرئيسية المصوّرة ── */
+.home-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 11px 22px;
+  font: 700 15px var(--sans);
+  text-decoration: none;
+  box-shadow: var(--shadow-1);
+}
+.btn-primary:hover { background: var(--accent-ink); }
+.btn-ghost {
+  background: var(--white);
+  color: var(--accent-ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 11px 22px;
+  font: 700 15px var(--sans);
+  text-decoration: none;
+}
+.btn-ghost:hover { border-color: var(--accent); background: var(--accent-soft); }
+.home-section { margin-top: 42px; scroll-margin-top: 70px; }
+.kicker {
+  font: 700 12px var(--sans);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 4px;
+}
+.home-section > h2 { margin-top: 0; scroll-margin-top: 76px; }
+.home-lead { color: var(--muted); font-size: 14.5px; margin: 0; }
+.cardgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 16px 0 8px;
+}
+.cardgrid a.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  transition: transform .12s, box-shadow .12s, border-color .12s;
+  box-shadow: var(--shadow-1);
+}
+.cardgrid a.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); border-color: #cfe2d8; }
+.cardgrid .thumb { aspect-ratio: 3 / 2; width: 100%; object-fit: cover; display: block; background: var(--card); }
+.cardgrid .pad { padding: 12px 15px 15px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.cardgrid .cat {
+  font: 700 10.5px var(--sans);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid #cfe2d8;
+}
+.cardgrid .t { font: 650 17px/1.35 var(--serif); }
+.cardgrid a.card:hover .t { color: var(--accent-ink); }
+.cardgrid .d { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+
+/* ── الأسئلة الشائعة: أكورديون ── */
+.faq-item {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: 10px 0;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 13px 44px 13px 16px;
+  font: 650 15.5px/1.5 var(--sans);
+  color: var(--ink);
+  position: relative;
+  min-height: 44px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "+";
+  position: absolute;
+  inset-inline-end: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 700 19px/1 var(--sans);
+  color: var(--accent);
+  transition: transform .15s;
+}
+.faq-item[open] summary::after { content: "3"; }
+.faq-item summary:hover { background: var(--accent-soft); }
+.faq-item .faq-a { padding: 2px 16px 14px; font-size: 15px; color: var(--ink-soft); line-height: 1.7; }
+.faq-item .faq-a p { margin: 8px 0 0; }
+
+/* ── طباعة v3: يخفي الشريط والأدوات، ويحترم وضع «الجداول فقط» ── */
+@media print {
+  .rail, .rail-card, .float-cook, .afconv, .chip-btn, .crumbs, .cookbar, .cookmode, .home-cta {
+    display: none !important;
+  }
+  .shell { display: block; }
+  main { max-width: none; padding: 0; }
+  body.charts-only .content p,
+  body.charts-only .content ul,
+  body.charts-only .content ol,
+  body.charts-only .content blockquote,
+  body.charts-only .content figure,
+  body.charts-only .content .video { display: none !important; }
+  body.charts-only .content h2 { margin-top: 1.1em; }
+  .faq-item { break-inside: avoid; box-shadow: none; }
+}
+
+/* ── استجابة v3 ── */
+@media (max-width: 1080px) {
+  .shell { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
+  .rail { position: static; margin-top: 36px; }
+}
+@media (max-width: 640px) {
+  main { padding: 0 16px 48px; }
+  .cardgrid { grid-template-columns: 1fr; }
+  .afconv { padding: 16px; }
+  .afconv label { flex: 1 1 100%; }
+  .afconv input { width: 100%; flex: 1; }
+  .afconv .field { display: flex; }
+  .afconv .go { flex: 1 1 100%; }
+  .float-cook { padding: 11px 16px; }
+  .cookmode .content { font-size: 19px; }
+}

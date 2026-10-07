@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Oven to Air Fryer Converter (Free Tool)</title>
+<meta name="description" content="Convert any oven recipe to the air fryer: lower the temperature 25°F / 15°C and cut the time 20 percent — free instant converter with the doneness temperatures built in."/>
+<link rel="canonical" href="https://crispcharts.me/tools/oven-to-air-fryer-converter.html"/>
+<meta name="theme-color" content="#1f7a4d"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f7a4d'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='34' font-weight='700' fill='%23fdfaf3' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"/>
+<meta property="og:site_name" content="Crisp Charts"/>
+<meta property="og:title" content="Oven to Air Fryer Converter (Free Tool)"/>
+<meta property="og:description" content="Convert any oven recipe to the air fryer: lower the temperature 25°F / 15°C and cut the time 20 percent — free instant converter with the doneness temperatures built in."/>
+<meta property="og:url" content="https://crispcharts.me/tools/oven-to-air-fryer-converter.html"/>
+<link rel="alternate" type="application/atom+xml" title="Crisp Charts" href="https://crispcharts.me/atom.xml"/>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Oven to Air Fryer Converter","url":"https://crispcharts.me/tools/oven-to-air-fryer-converter.html","applicationCategory":"UtilityApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://crispcharts.me/"},{"@type":"ListItem","position":2,"name":"All charts","item":"https://crispcharts.me/"},{"@type":"ListItem","position":3,"name":"Oven to Air Fryer Converter"}]}</script>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<header class="site"><div class="bar">
+<a class="brand" href="/"><span class="mark">C</span>Crisp<em> Charts</em></a>
+<nav class="top"><a href="/tools/oven-to-air-fryer-converter.html">Converter</a><a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a></nav>
+</div></header>
+<main>
+<div class="shell">
+<article class="content"><div class="hero"><h1>Oven to Air Fryer Converter</h1><p class="lede">Enter an oven temperature and time, get the air fryer setting to use instead — built on the same rule as our full conversion chart: 25°F lower, about 20% less time, and check early.</p></div>
+<div class="afconv" id="afconv">
+  <p class="afconv-title">Oven → air fryer converter</p>
+  <p class="afconv-sub">Enter any oven recipe's temperature and time, get the air fryer equivalent.</p>
+  <div class="fields">
+    <label>Oven temperature
+      <span class="field"><input class="afconv-temp" type="number" inputmode="numeric" value="350" min="130" max="550" step="5" aria-label="Oven temperature"><select class="afconv-unit" aria-label="Temperature unit"><option value="F" selected>°F</option><option value="C">°C</option></select></span>
+    </label>
+    <label>Oven time (minutes)
+      <span class="field"><input class="afconv-time" type="number" inputmode="numeric" value="30" min="1" max="240" step="5" aria-label="Oven time in minutes"></span>
+    </label>
+    <button class="go afconv-go" type="button">Convert →</button>
+  </div>
+  <div class="out afconv-out" hidden></div>
+  <p class="afconv-err" role="alert"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('afconv');
+  if (!root) return;
+  var temp = root.querySelector('.afconv-temp'),
+      unit = root.querySelector('.afconv-unit'),
+      time = root.querySelector('.afconv-time'),
+      go = root.querySelector('.afconv-go'),
+      out = root.querySelector('.afconv-out'),
+      err = root.querySelector('.afconv-err');
+  function round5(x) { return Math.round(x / 5) * 5; }
+  function run() {
+    out.hidden = true;
+    err.textContent = '';
+    var t = parseFloat(temp.value), m = parseFloat(time.value), u = unit.value;
+    if (isNaN(t) || isNaN(m) || m <= 0) { err.textContent = 'Enter both the oven temperature and the time first.'; return; }
+    var lo = u === 'F' ? 130 : 55, hi = u === 'F' ? 550 : 290;
+    if (t < lo || t > hi) { err.textContent = 'Enter an oven temperature between ' + lo + ' and ' + hi + ' degrees ' + u + '.'; return; }
+    var ovenF = u === 'F' ? t : Math.round(t * 9 / 5 + 32);
+    var afF = round5(ovenF - 25);
+    var afC = Math.round((afF - 32) * 5 / 9);
+    var minutes = Math.max(3, Math.round(m * 0.8));
+    var checkAt = Math.max(1, Math.round(m * 0.66));
+    var html = '<span class="big">Set the air fryer to <b>' + afF + '\u00B0F / ' + afC + '\u00B0C</b></span>' +
+      '<span class="check">Cook for about <b>' + minutes + ' minutes</b> \u2014 start checking around <b>' + checkAt + ' minutes</b>.</span>';
+    if (afF < 200) {
+      html += '<span class="warn">Most air fryers bottom out near 200\u00B0F \u2014 use the lowest setting and expect to add time.</span>';
+    }
+    if (m * 0.8 < 8) {
+      html += '<span class="warn">This is a very short bake \u2014 check almost immediately. Small foods burn fast in the basket.</span>';
+    }
+    html += '<span class="disclaim">Rule of thumb: 25\u00B0F lower, about 20% less time. Every model differs \u2014 verify doneness with a thermometer.</span>';
+    out.innerHTML = html;
+    out.hidden = false;
+  }
+  go.addEventListener('click', run);
+  [temp, time].forEach(function (el) {
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
+  });
+  unit.addEventListener('change', run);
+})();
+</script><h2>How the conversion works</h2><p>An air fryer is a small convection oven with the heating element inches from the food, so an oven recipe runs hot and fast inside it. Two adjustments fix almost everything: lower the temperature by about 25°F / 15°C, and cut the time by about 20 percent. Then start checking at two-thirds of the converted time — once something over-browns, there is no way back.</p><h2>When not to convert</h2><p>Whole birds, large roasts, wet batters and anything cooked in liquid do not convert well: the basket is small, holds one layer, and the element sits close to the food. For the full list of what works and what fails, read the <a href="/posts/oven-to-air-fryer-conversion-chart.html">oven to air fryer conversion chart</a>.</p><h2>Verify doneness, always</h2><p>The converter gives a starting point, not a finish line. Times vary by wattage and basket size. Use an instant-read thermometer: poultry 165°F / 74°C, ground meats 160°F / 71°C, whole cuts of pork, beef and lamb 145°F / 63°C, fish and shellfish 145°F / 63°C.</p></article>
+<aside class="rail" aria-label="Sidebar"><div class="rail-card"><h3>Safe internal temperatures</h3><table><thead><tr><th>Food</th><th>Safe temp</th></tr></thead><tbody><tr><td>Poultry (all)</td><td><b>165°F / 74°C</b></td></tr><tr><td>Ground meats</td><td><b>160°F / 71°C</b></td></tr><tr><td>Beef, pork, lamb (cuts)</td><td><b>145°F / 63°C</b> + rest</td></tr><tr><td>Fish &amp; shellfish</td><td><b>145°F / 63°C</b></td></tr></tbody></table><p class="note">USDA minimums. An instant-read thermometer is the only reliable check — color and timing are not.</p></div><div class="rail-card"><h3>Save &amp; follow</h3><p>Pin this chart to your board so it is in your kitchen next time.</p><div class="links"><a href="https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fcrispcharts.me%2Ftools%2Foven-to-air-fryer-converter.html&media=https%3A%2F%2Fcrispcharts.me%2Fog-default.png&description=Oven%20to%20Air%20Fryer%20Converter%20%E2%80%94%20Convert%20any%20oven%20recipe%20to%20the%20air%20fryer." rel="nofollow noopener" target="_blank">📌 Pin it</a><a href="/atom.xml">📰 RSS feed</a><a href="/">🗂 All charts</a></div></div></aside>
+</div>
+</main>
+<footer class="site"><div class="bar">
+<div class="pages">
+<a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a><a href="/p/privacy-policy.html">Privacy</a><a href="/p/disclaimer.html">Disclaimer</a><a href="/p/terms-of-use.html">Terms</a>
+</div>
+<div>© 2026 Crisp Charts. Cooking times are starting points — always verify with a thermometer.</div>
+</div></footer>
+
+
+</body>
+</html>
