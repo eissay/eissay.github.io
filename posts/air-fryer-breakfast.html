@@ -25,7 +25,7 @@
 <body>
 <header class="site"><div class="bar">
 <a class="brand" href="/"><span class="mark">C</span>Crisp<em> Charts</em></a>
-<nav class="top"><a href="/tools/oven-to-air-fryer-converter.html">Converter</a><a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a></nav>
+<nav class="top"><a href="/tools/oven-to-air-fryer-converter.html">Converter</a><a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a><button class="nav-search" type="button" aria-label="Search charts">🔍<span class="search-label"> Search</span></button></nav>
 </div></header>
 <main>
 <div class="shell">
@@ -68,6 +68,108 @@
 <div>© 2026 Crisp Charts. Cooking times are starting points — always verify with a thermometer.</div>
 </div></footer>
 <button class="float-print" onclick="window.print()" aria-label="Print this page">🖨 Print</button>
+
+<script>
+(function () {
+  var btn = document.querySelector('.nav-search');
+  if (!btn) return;
+  var overlay = null, input = null, list = null, index = null, indexPromise = null;
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function row(e) {
+    return '<a class="search-hit" href="' + e.u + '"><span class="t">' + esc(e.t) +
+      '</span><span class="d">' + esc(e.d) + '</span></a>';
+  }
+  function run() {
+    if (!index || !input) return;
+    var q = input.value.trim().toLowerCase();
+    if (q.length < 2) {
+      list.innerHTML = index.slice(0, 8).map(row).join('');
+      return;
+    }
+    var terms = q.split(/\s+/), hits = [];
+    for (var i = 0; i < index.length; i++) {
+      var it = index[i];
+      var hay = (it.t + ' ' + it.d + ' ' + it.l.join(' ') + ' ' + it.x).toLowerCase();
+      var ok = true;
+      for (var j = 0; j < terms.length; j++) {
+        if (hay.indexOf(terms[j]) < 0) { ok = false; break; }
+      }
+      if (ok) {
+        var tl = (it.t + ' ' + it.l.join(' ')).toLowerCase(), score = 0;
+        for (var k = 0; k < terms.length; k++) { if (tl.indexOf(terms[k]) >= 0) score += 2; }
+        hits.push({ e: it, s: score });
+      }
+    }
+    hits.sort(function (a, b) { return b.s - a.s; });
+    var out = '';
+    for (var m = 0; m < hits.length && m < 8; m++) out += row(hits[m].e);
+    list.innerHTML = out ||
+      '<p class="search-empty">No chart matches "' + esc(q) + '". Try: chicken, eggs, frozen, fries…</p>';
+  }
+  function close() {
+    if (!overlay) return;
+    overlay.remove();
+    overlay = null;
+    document.body.classList.remove('searching');
+    document.removeEventListener('keydown', onKey, true);
+  }
+  function onKey(e) { if (e.key === 'Escape') close(); }
+  function build() {
+    overlay = document.createElement('div');
+    overlay.className = 'search-overlay';
+    overlay.innerHTML =
+      '<div class="search-panel" role="dialog" aria-modal="true" aria-label="Search charts">' +
+      '<div class="search-bar"><input class="search-input" type="search" ' +
+      'placeholder="Search charts: chicken, frozen, eggs…" aria-label="Search charts">' +
+      '<button class="search-close" type="button" aria-label="Close search">✕</button></div>' +
+      '<div class="search-results"></div>' +
+      '<div class="search-hint">Type to search all charts · Enter opens the first result · Esc closes</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.body.classList.add('searching');
+    input = overlay.querySelector('.search-input');
+    list = overlay.querySelector('.search-results');
+    input.addEventListener('input', run);
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { var first = list.querySelector('a'); if (first) first.click(); }
+      else if (e.key === 'ArrowDown') {
+        var a = list.querySelector('a');
+        if (a) { a.focus(); e.preventDefault(); }
+      }
+    });
+    list.addEventListener('keydown', function (e) {
+      var items = Array.prototype.slice.call(list.querySelectorAll('a'));
+      var i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' && i < items.length - 1) { items[i + 1].focus(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (i > 0) items[i - 1].focus(); else input.focus(); }
+    });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    overlay.querySelector('.search-close').addEventListener('click', close);
+    if (!indexPromise) {
+      indexPromise = fetch('/search-index.json').then(function (r) { return r.json(); });
+    }
+    indexPromise.then(function (data) { index = data; run(); }).catch(function () {
+      list.innerHTML = '<p class="search-empty">Search is unavailable right now.</p>';
+    });
+    setTimeout(function () { input.focus(); }, 30);
+  }
+  function openSearch() {
+    if (overlay) return;
+    build();
+    document.addEventListener('keydown', onKey, true);
+  }
+  btn.addEventListener('click', openSearch);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && !overlay && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+      e.preventDefault();
+      openSearch();
+    }
+  });
+})();
+</script>
 <button class="float-cook" type="button" data-cook-open aria-label="Open cooking mode">🍳 Cook</button>
 <script>
 (function () {
