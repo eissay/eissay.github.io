@@ -447,15 +447,27 @@ header.site { background: rgba(253, 250, 243, .9); }
    v3 — تخطيط مجلة: عمودان + شريط جانبي مثبّت + أدوات مطبخ تفاعلية
    (حاسبة تحويل · وضع الطبخ · أسئلة شائعة قابلة للفتح · بطاقات مصوّرة)
    ═══════════════════════════════════════════════════════════════ */
-main { max-width: 1140px; padding: 0 22px 60px; }
-main.narrow { max-width: 800px; }
-header.site .bar, footer.site .bar { max-width: 1140px; }
+main { max-width: 1280px; padding: 0 24px 60px; }
+main.narrow { max-width: 860px; }
+header.site .bar, footer.site .bar { max-width: 1280px; }
+
+/* خط أساس أكبر قليلًا: المحتوى يُقرأ من مسافة أريكة */
+body { font-size: clamp(16px, 0.5vw + 15px, 18px); }
+.content table { font-size: 0.96em; }
+
+/* خلفية الصفحة: غسلة دافئة خفيفة تمنع شعور الفراغ على الجانبين */
+body {
+  background:
+    radial-gradient(1100px 560px at 88% -120px, rgba(31, 122, 77, .055), transparent 60%),
+    radial-gradient(900px 520px at -120px 30%, rgba(180, 106, 27, .045), transparent 55%),
+    var(--paper);
+}
 
 /* ── الشبكة: محتوى + شريط جانبي ── */
 .shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 36px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 40px;
   align-items: start;
   padding-top: 26px;
 }
@@ -563,6 +575,11 @@ header.site .bar, footer.site .bar { max-width: 1140px; }
 .float-cook:hover { background: #96551a; }
 @supports (padding: max(0px)) {
   .float-cook { bottom: calc(84px + env(safe-area-inset-bottom)); inset-inline-end: max(20px, env(safe-area-inset-right)); }
+}
+/* على الشاشات الواسعة: الأزرار العائمة زائدة — وظائفها كلها في الشريط الجانبي
+   وزر البطل، وتثبيتها في ركن الشاشة يجعلها تبدو منفصلة عن المحتوى */
+@media (min-width: 1081px) {
+  .float-print, .float-cook { display: none !important; }
 }
 
 /* ── وضع الطبخ: غلاف بملء الشاشة بخط كبير ── */
