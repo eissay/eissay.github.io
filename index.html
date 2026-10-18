@@ -1,16 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Crisp Charts</title>
 <meta name="description" content="Printable air fryer time and temperature charts — frozen foods, vegetables, chicken, fish and more, with the safe internal temperatures that actually matter."/>
 <link rel="canonical" href="https://crispcharts.me/"/>
-<meta name="theme-color" content="#1f7a4d"/>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f7a4d'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='34' font-weight='700' fill='%23fdfaf3' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"/>
+<meta name="theme-color" content="#16110d"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c69422'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='36' font-weight='800' fill='%2316110d' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E"/><script>
+(function () {
+  try {
+    var t = localStorage.getItem('cc-theme');
+    if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+})();
+</script>
+<script>
+function ccToggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', cur);
+  try { localStorage.setItem('cc-theme', cur); } catch (e) {}
+  var b = document.querySelector('.theme-btn');
+  if (b) b.textContent = cur === 'light' ? '\u263C' : '\u263E';
+}
+</script>
 <meta property="og:site_name" content="Crisp Charts"/>
 <meta property="og:title" content="Crisp Charts"/>
 <meta property="og:description" content="Printable air fryer time and temperature charts — frozen foods, vegetables, chicken, fish and more, with the safe internal temperatures that actually matter."/>
@@ -22,11 +36,11 @@
 <body>
 <header class="site"><div class="bar">
 <a class="brand" href="/"><span class="mark">C</span>Crisp<em> Charts</em></a>
-<nav class="top"><a href="/tools/oven-to-air-fryer-converter.html">Converter</a><a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a><button class="nav-search" type="button" aria-label="Search charts">🔍<span class="search-label"> Search</span></button></nav>
+<nav class="top"><a href="/tools/oven-to-air-fryer-converter.html">Converter</a><a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a><button class="nav-search" type="button" aria-label="Search charts">🔍<span class="search-label"> Search</span></button><button class="theme-btn" type="button" onclick="ccToggleTheme()" aria-label="Toggle light/dark theme" title="Light / dark">☾</button></nav>
 </div></header>
 <main>
 <div class="shell">
-<article class="content"><div class="hero"><h1>Crisp Charts</h1><p class="lede">Printable air fryer time and temperature charts — frozen foods, vegetables, chicken, fish and more, with the safe internal temperatures that actually matter.</p><div class="chips"><span class="chip accent">54 printable charts</span><span class="chip">Updated October 18, 2026</span></div><div class="home-cta"><a class="btn-primary" href="#all-charts">Browse all charts</a><a class="btn-ghost" href="#converter">Open the converter</a></div></div><section class="home-section" id="converter">
+<article class="content"><div class="hero"><span class="chip accent">📊 Compiled from USDA & manufacturer data</span><h1>Air Fryer Time & Temperature Charts</h1><p class="lede">Printable air fryer time and temperature charts — frozen foods, vegetables, chicken, fish and more, with the safe internal temperatures that actually matter.</p><div class="hero-stats"><div class="hstat"><span class="num count" data-to="54">0</span><span class="lbl">Printable charts</span></div><div class="hstat"><span class="num">~<span class="count" data-to="14">0</span> min</span><span class="lbl">Average cook time</span></div></div><div class="hero-foods"><a href="/posts/air-fryer-chicken-times-temperatures.html"><img src="/images/air-fryer-chicken-times-temperatures-01.jpg" alt="Air Fryer Chicken Time and Temperature Chart" loading="lazy"/><span class="hfname">Chicken Time and Temperature…<span class="badge-t">375°F · 18–22 min</span></span></a><a href="/posts/air-fryer-frozen-foods-chart.html"><img src="/images/air-fryer-frozen-foods-chart-01.jpg" alt="Air Fryer Frozen Foods Chart (Times and Temperatures)" loading="lazy"/><span class="hfname">Frozen Foods Chart (Times an…<span class="badge-t">400°F · 12–15 min</span></span></a><a href="/posts/air-fryer-cooking-times-chart.html"><img src="/images/air-fryer-cooking-times-chart-01.jpg" alt="Air Fryer Cooking Times Chart (Free Printable)" loading="lazy"/><span class="hfname">Cooking Times Chart (Free Pr…<span class="badge-t">400°F · 12–15 min</span></span></a><a href="/posts/air-fryer-vegetables-chart.html"><img src="/images/air-fryer-vegetables-chart-01.jpg" alt="Air Fryer Vegetables Chart (Fresh and Frozen Times)" loading="lazy"/><span class="hfname">Vegetables Chart (Fresh and…<span class="badge-t">380°F · 8–10 min</span></span></a></div><div class="home-cta"><a class="btn-primary" href="#all-charts">Browse all charts</a><a class="btn-ghost" href="#converter">Open the converter</a></div></div><section class="home-section" id="how-to"><p class="kicker">3 steps</p><h2>How to use this chart</h2><div class="howto"><div class="step"><span class="n">1</span><p class="st">Preheat</p><p class="sd">3 minutes at the listed temperature — a hot basket is what builds the crust.</p></div><div class="step"><span class="n">2</span><p class="st">Cook & shake</p><p class="sd">Use the chart time. Shake the basket or flip halfway for even browning.</p></div><div class="step"><span class="n">3</span><p class="st">Check & adjust</p><p class="sd">For meat, verify with a thermometer — the safe internal temperatures are on every page.</p></div></div></section><section class="home-section" id="categories"><p class="kicker">Browse</p><h2>Find your food</h2><div class="catgrid"><a class="cat-card" href="#all-charts"><span class="ico">📊</span><span><span class="nm">Times &amp; Temperatures</span><span class="ct">37 charts</span></span></a><a class="cat-card" href="#all-charts"><span class="ico">📋</span><span><span class="nm">Air Fryer Basics</span><span class="ct">14 charts</span></span></a><a class="cat-card" href="#all-charts"><span class="ico">📊</span><span><span class="nm">Cheat Sheets</span><span class="ct">2 charts</span></span></a><a class="cat-card" href="#all-charts"><span class="ico">📋</span><span><span class="nm">Meal Prep</span><span class="ct">1 charts</span></span></a></div></section><section class="home-section" id="converter">
 <div class="afconv" id="afconv">
   <p class="afconv-title">Oven → air fryer converter</p>
   <p class="afconv-sub">Enter any oven recipe's temperature and time, get the air fryer equivalent.</p>
@@ -136,14 +150,37 @@
 <a class="card" href="/posts/air-fryer-turkey-burgers.html"><img class="thumb" src="/images/air-fryer-turkey-burgers-01.jpg" alt="Air Fryer Turkey Burgers: Juicy Patties at the Right Temperature" loading="lazy"/><span class="pad"><span class="cat">Times &amp; Temperatures</span><span class="t">Air Fryer Turkey Burgers: Juicy Patties at the Right Temperature</span><span class="d">Air fryer turkey burger times for fresh and frozen patties, with 375°F / 190°C settings and the 165°F / 74°C internal rule for ground turkey.</span></span></a>
 <a class="card" href="/posts/air-fryer-whole-chicken.html"><img class="thumb" src="/images/air-fryer-whole-chicken-01.jpg" alt="Air Fryer Whole Chicken: Time, Temperature and Doneness" loading="lazy"/><span class="pad"><span class="cat">Times &amp; Temperatures</span><span class="t">Air Fryer Whole Chicken: Time, Temperature and Doneness</span><span class="d">How to cook a whole chicken in an air fryer, with times by weight, the spatchcock shortcut and the internal temperatures that matter.</span></span></a>
 <a class="card" href="/posts/how-to-clean-an-air-fryer.html"><img class="thumb" src="/images/how-to-clean-an-air-fryer-01.jpg" alt="How to Clean an Air Fryer (Schedule and Safe Methods)" loading="lazy"/><span class="pad"><span class="cat">Air Fryer Basics</span><span class="t">How to Clean an Air Fryer (Schedule and Safe Methods)</span><span class="d">How to clean an air fryer: a daily, weekly and monthly schedule, dishwasher-safe parts, baked-on grease fixes, element care and odour removal.</span></span></a></div></section></article>
-<aside class="rail" aria-label="Sidebar"><div class="rail-card"><h3>Quick tools</h3><div class="tools"><a class="rail-btn" href="#converter">⇄ Oven → air fryer converter</a></div><p class="note">Convert any oven recipe in seconds — free, no app.</p></div><div class="rail-card"><h3>Safe internal temperatures</h3><table><thead><tr><th>Food</th><th>Safe temp</th></tr></thead><tbody><tr><td>Poultry (all)</td><td><b>165°F / 74°C</b></td></tr><tr><td>Ground meats</td><td><b>160°F / 71°C</b></td></tr><tr><td>Beef, pork, lamb (cuts)</td><td><b>145°F / 63°C</b> + rest</td></tr><tr><td>Fish &amp; shellfish</td><td><b>145°F / 63°C</b></td></tr></tbody></table><p class="note">USDA minimums. An instant-read thermometer is the only reliable check — color and timing are not.</p></div><div class="rail-card"><h3>Save &amp; follow</h3><p>Pin this chart to your board so it is in your kitchen next time.</p><div class="links"><a href="https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fcrispcharts.me%2F&media=https%3A%2F%2Fcrispcharts.me%2Fog-default.png&description=Crisp%20Charts%20%E2%80%94%20Printable%20air%20fryer%20time%20and%20temperature%20charts%20%E2%80%94%20frozen%20foods%2C%20vegetables%2C%20chicken%2C%20fish%20and%20more%2C%20with%20the%20safe%20internal%20temperatures%20that%20actually%20matter." rel="nofollow noopener" target="_blank">📌 Pin it</a><a href="/atom.xml">📰 RSS feed</a><a href="/">🗂 All charts</a></div></div></aside>
+<aside class="rail" aria-label="Sidebar"><div class="rail-card"><h3>Quick tools</h3><div class="tools"><a class="rail-btn" href="#converter">⇄ Oven → air fryer converter</a></div><p class="note">Convert any oven recipe in seconds — free, no app.</p></div><div class="rail-card"><h3>Safe internal temperatures</h3><table><thead><tr><th>Food</th><th>Safe temp</th></tr></thead><tbody><tr><td>Poultry (all)</td><td><b>165°F / 74°C</b></td></tr><tr><td>Ground meats</td><td><b>160°F / 71°C</b></td></tr><tr><td>Beef, pork, lamb (cuts)</td><td><b>145°F / 63°C</b> + rest</td></tr><tr><td>Fish &amp; shellfish</td><td><b>145°F / 63°C</b></td></tr></tbody></table><p class="note">USDA minimums. An instant-read thermometer is the only reliable check — color and timing are not.</p></div><div class="rail-card"><h3>Save &amp; follow</h3><p>Pin this chart to your board so it is in your kitchen next time.</p><div class="links"><a href="https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fcrispcharts.me%2F&media=https%3A%2F%2Fcrispcharts.me%2Fog-default.png&description=Crisp%20Charts%20%E2%80%94%20Printable%20air%20fryer%20time%20and%20temperature%20charts%20%E2%80%94%20frozen%20foods%2C%20vegetables%2C%20chicken%2C%20fish%20and%20more%2C%20with%20the%20safe%20internal%20temperatures%20that%20actually%20matter." rel="nofollow noopener" target="_blank">📌 Pin it</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fcrispcharts.me%2F&text=Crisp%20Charts" rel="nofollow noopener" target="_blank">𝕏 Post</a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcrispcharts.me%2F" rel="nofollow noopener" target="_blank">f Share</a><a href="/atom.xml">📰 RSS</a><a href="/">🗂 All charts</a></div></div></aside>
 </div>
 </main>
 <footer class="site"><div class="bar">
-<div class="pages">
-<a href="/p/about.html">About</a><a href="/p/contact.html">Contact</a><a href="/p/privacy-policy.html">Privacy</a><a href="/p/disclaimer.html">Disclaimer</a><a href="/p/terms-of-use.html">Terms</a>
+<div class="footgrid">
+  <div>
+    <div class="fbrand"><span style="color:var(--gold)">🔥</span> Crisp Charts</div>
+    <p class="fabout">Exact air fryer times and temperatures for every food —
+    compiled from USDA safety data and manufacturer guidelines, printable in one tap.</p>
+  </div>
+  <div><h4>Charts</h4><ul>
+    <li><a href="/">All charts</a></li>
+    <li><a href="/tools/oven-to-air-fryer-converter.html">Oven converter</a></li>
+    <li><a href="/atom.xml">RSS feed</a></li>
+  </ul></div>
+  <div><h4>Kitchen tools</h4><ul>
+    <li><a href="/tools/oven-to-air-fryer-converter.html">⇄ Oven → air fryer</a></li>
+    <li><a href="/">🔍 Search charts</a></li>
+    <li><a href="/">🖨 Print any chart</a></li>
+  </ul></div>
+  <div><h4>Trust</h4><ul>
+    <li><a href="/p/about.html">About</a></li>
+    <li><a href="/p/contact.html">Contact</a></li>
+    <li><a href="/p/privacy-policy.html">Privacy</a></li>
+    <li><a href="/p/disclaimer.html">Disclaimer</a></li>
+  </ul></div>
 </div>
-<div>© 2026 Crisp Charts. Cooking times are starting points — always verify with a thermometer.</div>
+<div class="footlegal">
+  <span>© 2026 Crisp Charts. Cooking times are starting points — always verify with a thermometer.</span>
+  <a href="/p/terms-of-use.html">Terms</a>
+</div>
 </div></footer>
 
 
@@ -249,5 +286,34 @@
 })();
 </script>
 
+<script>
+(function () {
+  var els = document.querySelectorAll('.count[data-to]');
+  if (!els.length) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    els.forEach(function (el) { el.textContent = el.getAttribute('data-to'); });
+    return;
+  }
+  function show(el) {
+    var to = parseInt(el.getAttribute('data-to'), 10) || 0, t0 = null, dur = 900;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(show); return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { show(en.target); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.4 });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
 </body>
 </html>
