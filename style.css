@@ -1006,7 +1006,7 @@ ul.listing .d { color: var(--muted); font-size: 15px; margin-top: 5px; }
 @media print {
   header.site, footer.site, nav.top, .ad, .toc, .print-btn, .float-print, .float-cook, .related,
   .rail, .rail-card, .chip-btn, .crumbs, .cookbar, .cookmode, .home-cta, .search-overlay, .theme-btn,
-  .statcards, .hero-foods, .hero-stats, .badge-row {
+  .hero .statcards, .hero-foods, .hero-stats, .badge-row, .gb-wiz, .gb-actions {
     display: none !important;
   }
   .shell { display: block; }
@@ -1014,6 +1014,9 @@ ul.listing .d { color: var(--muted); font-size: 15px; margin-top: 5px; }
   body { font-size: 11pt; background: #fff; color: #000; }
   body, .hero, .statcard, table { background: #fff !important; color: #000; }
   .hero { border: 0; box-shadow: none; padding: 0; margin: 0; }
+  .gb-guide { box-shadow: none; }
+  .statcard { border: 1px solid #999; background: #fff; }
+  .statcard .num { color: #000; }
   table { page-break-inside: avoid; box-shadow: none; border-color: #999; }
   th, td { border: 1px solid #999; padding: 4px 6px; color: #000; }
   td b, td strong { color: #000; }
