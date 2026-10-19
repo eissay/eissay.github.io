@@ -32,203 +32,193 @@ function ccToggleTheme() {
 <meta name="p:domain_verify" content="233831b8e0ee8e9f8a19f9c72faed3eb"/>
 <link rel="alternate" type="application/atom+xml" title="Crisp Charts" href="https://crispcharts.me/atom.xml"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Air Fryer Guide Generator","url":"https://crispcharts.me/tools/air-fryer-guide-generator.html","applicationCategory":"UtilityApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Pick any food, its state and your air fryer \u2014 get exact time, temperature, safe internal temperature and the full method."}
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does the guide generator work?","acceptedAnswer":{"@type":"Answer","text":"You pick the food, its state (frozen, fresh, marinated), the amount and a few details about your air fryer. The tool looks up tested time and temperature tables, applies fixed adjustment rules for your choices, and assembles a complete guide \u2014 the same inputs always produce the same answer."}},{"@type":"Question","name":"Does it use AI or send my data anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. There is no AI and no server: the entire food library and the calculation engine load once and run inside your browser. It works offline after the first load, and nothing you select is sent anywhere."}},{"@type":"Question","name":"Where do the times and temperatures come from?","acceptedAnswer":{"@type":"Answer","text":"Three sources: the USDA safe minimum internal temperature table (poultry 165\u00b0F, ground meats 160\u00b0F, whole cuts of pork, beef and lamb 145\u00b0F with a rest, fish and shellfish 145\u00b0F), our own library of tested air fryer charts, and manufacturer quick-start guidebooks for basket and oven-style models."}},{"@type":"Question","name":"Why does meat always say to use a thermometer?","acceptedAnswer":{"@type":"Answer","text":"Because air fryers vary in wattage, basket size and airflow far more than most people expect. The times are honest starting points, but the only reliable way to verify doneness is an instant-read thermometer in the thickest piece."}},{"@type":"Question","name":"The generator gave me a range, not one number. Which do I use?","acceptedAnswer":{"@type":"Answer","text":"Start checking at the low end \u2014 early is reversible, burnt is not. The range absorbs real-world variation between machines; your thermometer makes the final call."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does the guide generator work?","acceptedAnswer":{"@type":"Answer","text":"It is a chat that asks a few quick questions - what you are cooking, its state (frozen, fresh, marinated), the amount, your fryer and your goal. Type your answers, pick from the suggestions as you type, or use the dropdowns. Behind the chat is a fixed calculation engine: the same inputs always produce the same answer."}},{"@type":"Question","name":"Can I say everything in one sentence?","acceptedAnswer":{"@type":"Answer","text":"Yes - something like \u201ccrispy frozen chicken wings, 1 lb, oven style\u201d is parsed in one go and you get the temperatures immediately. The chat only asks about whatever is missing from your sentence."}},{"@type":"Question","name":"Does it use AI or send my data anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. There is no AI and no server: the entire food library and the calculation engine load once and run inside your browser. It is fully standalone, works offline after the first load, and nothing you type is sent anywhere."}},{"@type":"Question","name":"Where do the times and temperatures come from?","acceptedAnswer":{"@type":"Answer","text":"Three sources: the USDA safe minimum internal temperature table (poultry 165\u00b0F, ground meats 160\u00b0F, whole cuts of pork, beef and lamb 145\u00b0F with a rest, fish and shellfish 145\u00b0F), conservative time ranges compiled from manufacturer guidebooks, and fixed adjustment rules for state, amount, fryer type and goal - each shown on the answer."}},{"@type":"Question","name":"Why does meat always say to use a thermometer?","acceptedAnswer":{"@type":"Answer","text":"Because air fryers vary in wattage, basket size and airflow far more than most people expect. The times are honest starting points, but the only reliable way to verify doneness is an instant-read thermometer in the thickest piece."}},{"@type":"Question","name":"The answer gave me a range, not one number. Which do I use?","acceptedAnswer":{"@type":"Answer","text":"Start checking at the low end - early is reversible, burnt is not. The range absorbs real-world variation between machines; your thermometer makes the final call."}}]}
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://crispcharts.me/"},{"@type":"ListItem","position":2,"name":"All charts","item":"https://crispcharts.me/"},{"@type":"ListItem","position":3,"name":"Air Fryer Guide Generator"}]}</script>
-<link rel="stylesheet" href="/style.css"/><style>/* ═══ مولّد الدليل الكامل — Air Fryer Guide Generator ═══ */
+<link rel="stylesheet" href="/style.css"/><style>/* ═══ دردشة مولّد الدليل — Air Fryer Guide Chat ═══ */
 .gb { margin: 26px 0 8px; }
-.gb-wiz {
+.gc {
   background: linear-gradient(150deg, var(--bg-2), var(--bg-1));
   border: 1px solid var(--line-strong);
   border-radius: 18px;
-  padding: 22px;
-  box-shadow: var(--shadow-1);
+  padding: 18px;
+  box-shadow: var(--shadow-1), var(--glow);
 }
-.gb-step { margin: 0 0 18px; }
-.gb-step[hidden] { display: none; }
-.gb-q {
+.gc-log {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
   gap: 10px;
-  margin: 0 0 10px;
-  font: 600 16.5px var(--font-display);
-  color: var(--ink);
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 4px 2px 10px;
+  scroll-behavior: smooth;
 }
-.gb-q .gb-n {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  flex: none;
-  border-radius: 999px;
+.gc-msg {
+  max-width: 86%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font: 400 14.5px/1.65 var(--font-ui);
+  color: var(--ink-soft);
+  word-wrap: break-word;
+}
+.gc-msg.bot {
+  background: var(--bg-0);
+  border: 1px solid var(--line);
+  align-self: flex-start;
+  border-start-start-radius: 5px;
+}
+.gc-msg.user {
+  background: var(--gold-soft);
+  border: 1px solid rgba(247, 208, 96, .3);
+  color: var(--ink);
+  align-self: flex-end;
+  border-start-end-radius: 5px;
+}
+.gc-msg b { color: var(--gold); font-weight: 700; }
+.gc-msg .gc-mini { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+
+/* السؤال النشط: قوائم منسدلة داخل فقاعة البوت */
+.gc-widgets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.gc-sel, .gc-num {
+  font: 500 14px var(--font-ui);
+  color: var(--ink);
+  background: var(--bg-1);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 8px 10px;
+  max-width: 100%;
+}
+.gc-num { width: 90px; font-variant-numeric: tabular-nums; }
+.gc-sel:focus-visible, .gc-num:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.gc-set {
   background: linear-gradient(135deg, var(--gold), var(--gold-deep));
   color: var(--on-accent);
-  font: 800 13px var(--font-display);
-  transform: translateY(3px);
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font: 600 13.5px var(--font-ui);
+  cursor: pointer;
 }
-.gb-hint { font: 500 13px var(--font-ui); color: var(--muted); margin: 0 0 10px; }
+.gc-set:hover { filter: brightness(1.07); }
+.gc-unitlbl { font: 500 13px var(--font-ui); color: var(--muted); }
 
-.gb-search { display: flex; gap: 8px; flex-wrap: wrap; }
-.gb-search input {
-  flex: 1 1 240px;
+/* اقتراحات أثناء الكتابة */
+.gc-auto {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gc-auto[hidden] { display: none; }
+.gc-opt {
+  text-align: start;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px 12px;
+  font: 500 13.5px var(--font-ui);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.gc-opt:hover, .gc-opt.hl { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+.gc-opt .gc-cat { color: var(--muted); font-size: 11.5px; margin-inline-start: 6px; }
+
+/* سطر الإدخال الدائم */
+.gc-inputrow { display: flex; gap: 8px; margin-top: 4px; position: relative; }
+.gc-in {
+  flex: 1;
   min-width: 0;
-  font: 500 16px var(--font-ui);
+  font: 500 15px var(--font-ui);
   color: var(--ink);
   background: var(--bg-0);
   border: 1px solid var(--line-strong);
   border-radius: 12px;
   padding: 11px 14px;
 }
-.gb-search input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
-.gb-cats { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-.gb-cat {
-  background: var(--bg-0);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 13px;
-  font: 600 13px var(--font-ui);
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: border-color .12s, color .12s, background .12s;
-}
-.gb-cat:hover { border-color: var(--gold-deep); color: var(--gold); }
-.gb-cat[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold-deep); color: var(--gold); }
-.gb-foods { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
-.gb-food {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: var(--bg-1);
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  padding: 9px 12px;
-  font: 600 13.5px var(--font-ui);
-  color: var(--ink);
-  cursor: pointer;
-  text-align: start;
-  transition: border-color .12s, background .12s, transform .1s;
-}
-.gb-food:hover { border-color: var(--gold-deep); background: var(--gold-soft); transform: translateY(-1px); }
-.gb-food[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
-.gb-food .ico { font-size: 17px; flex: none; }
-.gb-more {
-  width: 100%;
-  background: transparent;
-  border: 1px dashed var(--line-strong);
-  border-radius: 11px;
-  padding: 9px;
-  color: var(--muted);
-  font: 600 13px var(--font-ui);
-  cursor: pointer;
-}
-.gb-more:hover { color: var(--gold); border-color: var(--gold-deep); }
-
-.gb-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.gb-chip {
-  background: var(--bg-0);
-  border: 1px solid var(--line-strong);
+.gc-in:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.gc-in::placeholder { color: var(--muted); }
+.gc-send {
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: var(--on-accent);
+  border: 0;
   border-radius: 12px;
-  padding: 10px 15px;
-  font: 600 14px var(--font-ui);
-  color: var(--ink-soft);
+  padding: 11px 20px;
+  font: 700 14px var(--font-ui);
   cursor: pointer;
-  transition: border-color .12s, color .12s, background .12s;
+  box-shadow: var(--shadow-1);
 }
-.gb-chip:hover { border-color: var(--gold-deep); color: var(--gold); }
-.gb-chip[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
-.gb-statenote { margin: 10px 0 0; font: 500 13.5px/1.6 var(--font-ui); color: var(--muted); }
-.gb-statenote b { color: var(--gold); font-weight: 600; }
+.gc-send:hover { filter: brightness(1.07); }
+.gc-hint { margin: 8px 2px 0; font: 500 12.5px var(--font-ui); color: var(--muted); }
+.gc-hint b { color: var(--gold-deep); font-weight: 600; }
 
-.gb-qtyrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.gb-qty {
-  width: 110px;
-  font: 600 17px var(--font-ui);
-  color: var(--ink);
-  background: var(--bg-0);
-  border: 1px solid var(--line-strong);
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-variant-numeric: tabular-nums;
-}
-.gb-qty:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
-.gb-unit { font: 600 14px var(--font-ui); color: var(--muted); }
-.gb-note { font: 500 13px var(--font-ui); color: var(--muted); margin: 8px 0 0; }
-
-.gb-opts { border: 1px solid var(--line); border-radius: 12px; background: var(--bg-0); padding: 0 14px; }
-.gb-opts summary {
-  cursor: pointer;
-  padding: 12px 2px;
-  font: 600 14px var(--font-ui);
-  color: var(--ink-soft);
-  list-style: none;
-  min-height: 44px;
-}
-.gb-opts summary::-webkit-details-marker { display: none; }
-.gb-opts summary::after { content: " +"; color: var(--gold); font-weight: 700; }
-.gb-opts[open] summary::after { content: " \2013"; }
-.gb-optgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; padding: 2px 2px 14px; }
-.gb-opt label { display: flex; flex-direction: column; gap: 5px; font: 600 12px var(--font-ui); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
-.gb-opt select {
-  font: 500 14px var(--font-ui);
-  color: var(--ink);
-  background: var(--bg-1);
-  border: 1px solid var(--line-strong);
-  border-radius: 9px;
-  padding: 8px 10px;
-}
-.gb-opt .gb-switch { display: flex; align-items: center; gap: 8px; font: 500 14px var(--font-ui); color: var(--ink-soft); text-transform: none; letter-spacing: 0; padding-top: 8px; }
-.gb-opt input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--gold-deep); }
-
-/* الناتج */
-.gb-guide {
-  margin-top: 20px;
+/* فقاعة الجواب */
+.gc-answer {
+  max-width: 100%;
+  align-self: stretch;
   background: var(--bg-1);
   border: 1px solid var(--line-strong);
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px 18px;
   box-shadow: var(--shadow-2);
   position: relative;
   overflow: hidden;
 }
-.gb-guide::before {
+.gc-answer::before {
   content: "";
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
   background: linear-gradient(90deg, var(--gold), var(--hot), var(--gold));
-  opacity: .8;
+  opacity: .85;
 }
-.gb-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
-.gb-title .gb-fname { font: 700 21px/1.25 var(--font-display); color: var(--ink); }
-.gb-title .gb-catp { font: 600 11.5px var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--gold); background: var(--gold-soft); border: 1px solid rgba(247, 208, 96, .3); border-radius: 999px; padding: 3px 10px; }
+.gc-say { margin: 12px 0 0; font: 400 15px/1.75 var(--font-ui); color: var(--ink-soft); }
+.gc-say b { color: var(--ink); font-weight: 700; }
+.gc-goalnote { margin: 8px 0 0; font: 500 13px/1.6 var(--font-ui); color: var(--gold); }
+.gc-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.gc-act {
+  background: var(--bg-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 7px 15px;
+  font: 600 12.5px var(--font-ui);
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.gc-act:hover { border-color: var(--gold-deep); color: var(--gold); background: var(--gold-soft); }
+.gc-details { margin-top: 12px; border: 1px dashed var(--line-strong); border-radius: 12px; padding: 0 14px; background: var(--bg-0); }
+.gc-details summary {
+  cursor: pointer;
+  padding: 11px 2px;
+  font: 600 13.5px var(--font-ui);
+  color: var(--ink-soft);
+  list-style: none;
+  min-height: 42px;
+}
+.gc-details summary::-webkit-details-marker { display: none; }
+.gc-details summary::after { content: " +"; color: var(--gold); font-weight: 700; }
+.gc-details[open] summary::after { content: " \2013"; }
+.gc-details .gb-adj { margin-top: 4px; }
 .gb-adj {
-  margin: 14px 0 0;
-  border: 1px dashed var(--line-strong);
-  border-radius: 12px;
-  padding: 11px 14px;
+  border: 0;
+  border-top: 1px dashed var(--line);
+  border-radius: 0;
+  padding: 10px 2px;
   font: 500 13px/1.65 var(--font-ui);
   color: var(--muted);
 }
 .gb-adj b { color: var(--gold); font-weight: 600; }
 .gb-adj ul { margin: 6px 0 0; padding-inline-start: 18px; }
 .gb-adj li { margin: 3px 0; }
-.gb-box {
-  margin: 13px 0 0;
-  border-radius: 12px;
-  padding: 12px 15px;
-  font: 500 14px/1.65 var(--font-ui);
-}
-.gb-box b { font-weight: 700; }
-.gb-box.doneness { background: var(--gold-soft); border: 1px solid rgba(247, 208, 96, .3); color: var(--ink-soft); }
-.gb-box.doneness b { color: var(--gold); }
-.gb-box.safety { background: var(--amber-soft); border: 1px solid rgba(255, 138, 92, .35); color: var(--ink-soft); }
-.gb-box.safety b { color: var(--hot); }
-.gb-steps { margin: 14px 0 0; padding: 0; list-style: none; counter-reset: gbstep; }
+.gb-steps { margin: 10px 0 0; padding: 0; list-style: none; counter-reset: gbstep; }
 .gb-steps li {
   counter-increment: gbstep;
   position: relative;
-  padding: 8px 0 8px 40px;
-  font: 400 14.5px/1.65 var(--font-ui);
+  padding: 7px 0 7px 36px;
+  font: 400 13.5px/1.6 var(--font-ui);
   color: var(--ink-soft);
   border-bottom: 1px solid var(--line);
 }
@@ -237,40 +227,35 @@ function ccToggleTheme() {
   content: counter(gbstep);
   position: absolute;
   left: 0;
-  top: 9px;
-  width: 26px;
-  height: 26px;
+  top: 8px;
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
   background: var(--bg-3);
   border: 1px solid var(--line-strong);
   color: var(--gold);
-  font: 700 13px/26px var(--font-display);
+  font: 700 12px/24px var(--font-display);
   text-align: center;
 }
-[dir="rtl"] .gb-steps li::before { left: auto; right: 0; }
-.gb-steps li::after { content: ""; }
-.gb-tips { margin: 13px 0 0; padding-inline-start: 20px; font: 400 13.5px/1.7 var(--font-ui); color: var(--muted); }
+.gb-tips { margin: 10px 0 0; padding-inline-start: 18px; font: 400 13px/1.7 var(--font-ui); color: var(--muted); }
 .gb-tips li { margin: 4px 0; }
 .gb-tips li::marker { color: var(--gold-deep); }
-.gb-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-.gb-actions .gb-act {
-  background: var(--bg-2);
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  padding: 8px 16px;
-  font: 600 13px var(--font-ui);
-  color: var(--ink-soft);
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: border-color .12s, color .12s, background .12s;
+.gb-box {
+  margin: 10px 0 0;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font: 500 13px/1.6 var(--font-ui);
 }
-.gb-actions .gb-act:hover { border-color: var(--gold-deep); color: var(--gold); background: var(--gold-soft); }
-.gb-actions .gb-act.primary { background: linear-gradient(135deg, var(--gold), var(--gold-deep)); color: var(--on-accent); border-color: transparent; }
-.gb-actions .gb-act.primary:hover { filter: brightness(1.06); color: var(--on-accent); }
-.gb-ver { margin: 14px 0 0; font: 500 11.5px/1.6 var(--font-ui); color: var(--muted); }
+.gb-box.safety { background: var(--amber-soft); border: 1px solid rgba(255, 138, 92, .35); color: var(--ink-soft); }
+.gb-box.safety b { color: var(--hot); }
+.gb-ver { margin: 12px 0 0; font: 500 11.5px/1.6 var(--font-ui); color: var(--muted); }
+.gb-noscript {
+  background: var(--amber-soft);
+  border: 1px solid rgba(255, 138, 92, .35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14.5px;
+}
 .gb-copy-toast {
   position: fixed;
   bottom: 24px;
@@ -286,24 +271,15 @@ function ccToggleTheme() {
   z-index: 99;
 }
 .gb-copy-toast.show { transform: translateX(-50%) translateY(0); }
-.gb-noscript {
-  background: var(--amber-soft);
-  border: 1px solid rgba(255, 138, 92, .35);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 14.5px;
-}
-.gb-loading { font: 500 14px var(--font-ui); color: var(--muted); padding: 18px 0; }
 @media (max-width: 640px) {
-  .gb-wiz { padding: 16px; border-radius: 14px; }
-  .gb-foods { grid-template-columns: 1fr 1fr; }
-  .gb-optgrid { grid-template-columns: 1fr; }
-  .gb-guide { padding: 15px; }
+  .gc { padding: 13px; border-radius: 14px; }
+  .gc-msg { max-width: 94%; }
+  .gc-log { max-height: 420px; }
 }
 @media print {
-  .gb-wiz { display: none !important; }
-  .gb-guide { box-shadow: none; border: 1px solid #999; }
-  .gb-actions, .gb-copy-toast { display: none !important; }
+  .gc-log, .gc-inputrow, .gc-hint { display: none !important; }
+  .gc-answer { box-shadow: none; border: 1px solid #999; }
+  .gc-actions, .gb-copy-toast { display: none !important; }
 }
 </style>
 </head>
@@ -314,7 +290,7 @@ function ccToggleTheme() {
 </div></header>
 <main>
 <div class="shell">
-<article class="content"><div class="hero"><h1>Air Fryer Guide Generator</h1><p class="lede">Pick any food, its state and the amount — get exact time, temperature, the safe internal temperature and the complete method. 126 foods, no app, nothing sent to any server.</p><div class="chips"><span class="chip accent">126 foods</span><span class="chip">USDA-based</span><span class="chip">Calculated — no AI</span><span class="chip">Works offline</span></div></div><div class="gb" id="gb"><div class="gb-loading">Loading the food library…</div><noscript><div class="gb-noscript">JavaScript is off, so the interactive generator cannot run — the numbers are still yours: browse the <a href="/posts/air-fryer-cooking-times-chart.html">master cooking times chart</a>, the <a href="/posts/air-fryer-frozen-foods-chart.html">frozen foods chart</a> or <a href="/posts/air-fryer-temperature-guide.html">the temperature guide</a>. Popular picks below already have exact settings.</div></noscript></div><div class="gb-copy-toast" id="gb-toast" role="status"></div><section class="home-section"><p class="kicker">Popular picks</p><h2>Exact settings, no clicks needed</h2><div class="table-wrap"><table><thead><tr><th>Food</th><th>Temperature</th><th>Time</th><th>Safe internal</th></tr></thead><tbody><tr><td><a href="/posts/air-fryer-chicken-times-temperatures.html">Chicken breast (boneless)</a></td><td><b>375°F</b> / 191°C</td><td>11–15 min</td><td>165°F</td></tr><tr><td><a href="/posts/air-fryer-chicken-wings.html">Chicken wings (whole)</a></td><td><b>380°F</b> / 193°C</td><td>17–22 min</td><td>165°F</td></tr><tr><td><a href="/posts/air-fryer-steak.html">Steak (sirloin, ribeye, NY strip)</a></td><td><b>400°F</b> / 204°C</td><td>9–12 min</td><td>145°F</td></tr><tr><td>Salmon fillet</td><td><b>390°F</b> / 199°C</td><td>7–10 min</td><td>145°F</td></tr><tr><td>French fries (frozen)</td><td><b>400°F</b> / 204°C</td><td>14–18 min</td><td>—</td></tr><tr><td>Tater tots (frozen)</td><td><b>400°F</b> / 204°C</td><td>13–17 min</td><td>—</td></tr><tr><td>Baked potato (russet)</td><td><b>400°F</b> / 204°C</td><td>38–48 min</td><td>—</td></tr><tr><td><a href="/posts/air-fryer-pork-chops.html">Pork chops (1 inch)</a></td><td><b>380°F</b> / 193°C</td><td>11–15 min</td><td>145°F</td></tr><tr><td><a href="/posts/air-fryer-bacon.html">Bacon (regular cut)</a></td><td><b>360°F</b> / 182°C</td><td>8–11 min</td><td>—</td></tr><tr><td><a href="/posts/air-fryer-shrimp.html">Shrimp (large, peeled)</a></td><td><b>400°F</b> / 204°C</td><td>5–7 min</td><td>145°F</td></tr><tr><td>Brussels sprouts (halved)</td><td><b>375°F</b> / 191°C</td><td>12–16 min</td><td>—</td></tr><tr><td>Eggs (hard-boiled)</td><td><b>250°F</b> / 121°C</td><td>15–17 min</td><td>—</td></tr></tbody></table></div></section><section class="home-section"><p class="kicker">3 steps</p><h2>How it works</h2><div class="howto"><div class="step"><span class="n">1</span><p class="st">Pick food & state</p><p class="sd">Search 90+ foods or browse by category. Frozen, fresh, marinated, breaded — the state changes the math, so it matters.</p></div><div class="step"><span class="n">2</span><p class="st">Tell it the amount</p><p class="sd">Time scales with quantity — the range adjusts automatically for a single fillet or a full basket.</p></div><div class="step"><span class="n">3</span><p class="st">Get the complete guide</p><p class="sd">Temperature, time, safe internal temperature, rest, the method, doneness cues — copy it, print it or pin it.</p></div></div></section><section class="home-section"><p class="kicker">Trust</p><h2>Calculated, not generated</h2><p>There is no AI here and there is no server either: the whole food library and the calculation engine load once and run inside your browser — offline, private, instant. Every number comes from fixed, reviewable tables:</p><ul><li>The <strong>USDA safe minimum internal temperature</strong> table — poultry 165°F, ground meats 160°F, whole cuts 145°F + rest, fish and shellfish 145°F, leftovers 165°F.</li><li><strong>Our own 54 tested charts</strong> — the same numbers we publish, now adjustable by state and amount.</li><li><strong>Manufacturer guidebooks</strong> for basket and oven-style air fryers, 1000–1800 W.</li></ul><p>Every applied adjustment is shown on the guide itself — you always see <em>why</em> a number changed. Times are honest ranges, never fake precision. Data v2026-10-17.</p></section><section class="home-section"><p class="kicker">Questions</p><h2>Frequently asked</h2><details class="faq-item"><summary>How does the guide generator work?</summary><div class="faq-a"><p>You pick the food, its state (frozen, fresh, marinated), the amount and a few details about your air fryer. The tool looks up tested time and temperature tables, applies fixed adjustment rules for your choices, and assembles a complete guide — the same inputs always produce the same answer.</p></div></details><details class="faq-item"><summary>Does it use AI or send my data anywhere?</summary><div class="faq-a"><p>No. There is no AI and no server: the entire food library and the calculation engine load once and run inside your browser. It works offline after the first load, and nothing you select is sent anywhere.</p></div></details><details class="faq-item"><summary>Where do the times and temperatures come from?</summary><div class="faq-a"><p>Three sources: the USDA safe minimum internal temperature table (poultry 165°F, ground meats 160°F, whole cuts of pork, beef and lamb 145°F with a rest, fish and shellfish 145°F), our own library of tested air fryer charts, and manufacturer quick-start guidebooks for basket and oven-style models.</p></div></details><details class="faq-item"><summary>Why does meat always say to use a thermometer?</summary><div class="faq-a"><p>Because air fryers vary in wattage, basket size and airflow far more than most people expect. The times are honest starting points, but the only reliable way to verify doneness is an instant-read thermometer in the thickest piece.</p></div></details><details class="faq-item"><summary>The generator gave me a range, not one number. Which do I use?</summary><div class="faq-a"><p>Start checking at the low end — early is reversible, burnt is not. The range absorbs real-world variation between machines; your thermometer makes the final call.</p></div></details></section></article>
+<article class="content"><div class="hero"><h1>Air Fryer Guide Generator</h1><p class="lede">A chat that knows air fryers. Tell it what you are cooking - type it, pick from the suggestions, or say it all in one sentence - answer the quick questions (state, fryer, goal) and get the exact temperatures with a sentence or two of guidance. 126 foods, no app.</p><div class="chips"><span class="chip accent">126 foods</span><span class="chip">USDA-based</span><span class="chip">Calculated - no AI</span><span class="chip">Runs in your browser</span></div></div><div class="gb" id="gb"><div class="gb-noscript">Loading the guide chat…</div><noscript><div class="gb-noscript">JavaScript is off, so the chat cannot run - the numbers are still yours: the <a href="/posts/air-fryer-cooking-times-chart.html">master cooking times chart</a>, the <a href="/posts/air-fryer-frozen-foods-chart.html">frozen foods chart</a> and the <a href="/posts/air-fryer-temperature-guide.html">temperature guide</a> cover the essentials, and the popular picks below already have exact settings.</div></noscript></div><div class="gb-copy-toast" id="gb-toast" role="status"></div><section class="home-section"><p class="kicker">Popular picks</p><h2>Exact settings, no clicks needed</h2><div class="table-wrap"><table><thead><tr><th>Food</th><th>Temperature</th><th>Time</th><th>Safe internal</th></tr></thead><tbody><tr><td><a href="/posts/air-fryer-chicken-times-temperatures.html">Chicken breast (boneless)</a></td><td><b>375°F</b> / 191°C</td><td>11–15 min</td><td>165°F</td></tr><tr><td><a href="/posts/air-fryer-chicken-wings.html">Chicken wings (whole)</a></td><td><b>380°F</b> / 193°C</td><td>17–22 min</td><td>165°F</td></tr><tr><td><a href="/posts/air-fryer-steak.html">Steak (sirloin, ribeye, NY strip)</a></td><td><b>400°F</b> / 204°C</td><td>9–12 min</td><td>145°F</td></tr><tr><td>Salmon fillet</td><td><b>390°F</b> / 199°C</td><td>7–10 min</td><td>145°F</td></tr><tr><td>French fries (frozen)</td><td><b>400°F</b> / 204°C</td><td>14–18 min</td><td>—</td></tr><tr><td>Tater tots (frozen)</td><td><b>400°F</b> / 204°C</td><td>13–17 min</td><td>—</td></tr><tr><td>Baked potato (russet)</td><td><b>400°F</b> / 204°C</td><td>38–48 min</td><td>—</td></tr><tr><td><a href="/posts/air-fryer-pork-chops.html">Pork chops (1 inch)</a></td><td><b>380°F</b> / 193°C</td><td>11–15 min</td><td>145°F</td></tr><tr><td><a href="/posts/air-fryer-bacon.html">Bacon (regular cut)</a></td><td><b>360°F</b> / 182°C</td><td>8–11 min</td><td>—</td></tr><tr><td><a href="/posts/air-fryer-shrimp.html">Shrimp (large, peeled)</a></td><td><b>400°F</b> / 204°C</td><td>5–7 min</td><td>145°F</td></tr><tr><td>Brussels sprouts (halved)</td><td><b>375°F</b> / 191°C</td><td>12–16 min</td><td>—</td></tr><tr><td>Eggs (hard-boiled)</td><td><b>250°F</b> / 121°C</td><td>15–17 min</td><td>—</td></tr></tbody></table></div></section><section class="home-section"><p class="kicker">3 steps</p><h2>How the chat works</h2><div class="howto"><div class="step"><span class="n">1</span><p class="st">Type your food</p><p class="sd">Start typing - suggestions appear as you go. Or write the whole sentence: “crispy frozen wings, 1 lb, oven style” is understood in one go.</p></div><div class="step"><span class="n">2</span><p class="st">Answer the quick questions</p><p class="sd">State (fresh, frozen, marinated…), amount, your fryer type and the goal - pick from the dropdowns or just type the words.</p></div><div class="step"><span class="n">3</span><p class="st">Get the temperatures</p><p class="sd">Exact temp, time and the safe internal temperature, with a sentence or two of guidance - and the full method one tap away if you want depth.</p></div></div></section><section class="home-section"><p class="kicker">Trust</p><h2>Calculated, not generated</h2><p>There is no AI here and there is no server either: the whole food library and the calculation engine load once and run inside your browser - offline, private, instant, and fully standalone. Every number comes from fixed, reviewable tables:</p><ul><li>The <strong>USDA safe minimum internal temperature</strong> table - poultry 165°F, ground meats 160°F, whole cuts 145°F + rest, fish and shellfish 145°F, leftovers 165°F.</li><li><strong>Tested time tables</strong> compiled from manufacturer guidebooks and kitchen practice - the same conservative ranges we publish across the site.</li><li><strong>Fixed adjustment rules</strong> - frozen, marinated, breaded, fryer type, wattage and your goal each shift the numbers by a declared amount you can see.</li></ul><p>Times are honest ranges, never fake precision. Data v2026-10-17.</p></section><section class="home-section"><p class="kicker">Questions</p><h2>Frequently asked</h2><details class="faq-item"><summary>How does the guide generator work?</summary><div class="faq-a"><p>It is a chat that asks a few quick questions - what you are cooking, its state (frozen, fresh, marinated), the amount, your fryer and your goal. Type your answers, pick from the suggestions as you type, or use the dropdowns. Behind the chat is a fixed calculation engine: the same inputs always produce the same answer.</p></div></details><details class="faq-item"><summary>Can I say everything in one sentence?</summary><div class="faq-a"><p>Yes - something like “crispy frozen chicken wings, 1 lb, oven style” is parsed in one go and you get the temperatures immediately. The chat only asks about whatever is missing from your sentence.</p></div></details><details class="faq-item"><summary>Does it use AI or send my data anywhere?</summary><div class="faq-a"><p>No. There is no AI and no server: the entire food library and the calculation engine load once and run inside your browser. It is fully standalone, works offline after the first load, and nothing you type is sent anywhere.</p></div></details><details class="faq-item"><summary>Where do the times and temperatures come from?</summary><div class="faq-a"><p>Three sources: the USDA safe minimum internal temperature table (poultry 165°F, ground meats 160°F, whole cuts of pork, beef and lamb 145°F with a rest, fish and shellfish 145°F), conservative time ranges compiled from manufacturer guidebooks, and fixed adjustment rules for state, amount, fryer type and goal - each shown on the answer.</p></div></details><details class="faq-item"><summary>Why does meat always say to use a thermometer?</summary><div class="faq-a"><p>Because air fryers vary in wattage, basket size and airflow far more than most people expect. The times are honest starting points, but the only reliable way to verify doneness is an instant-read thermometer in the thickest piece.</p></div></details><details class="faq-item"><summary>The answer gave me a range, not one number. Which do I use?</summary><div class="faq-a"><p>Start checking at the low end - early is reversible, burnt is not. The range absorbs real-world variation between machines; your thermometer makes the final call.</p></div></details></section></article>
 <aside class="rail" aria-label="Sidebar"><div class="rail-card"><h3>Kitchen tools</h3><div class="tools"><a class="rail-btn" href="/tools/air-fryer-guide-generator.html">🧭 Guide generator (90+ foods)</a><a class="rail-btn" href="/tools/oven-to-air-fryer-converter.html">⇄ Oven → air fryer converter</a><button class="rail-btn" type="button" data-cook-open>🍳 Cooking mode</button><button class="rail-btn" type="button" data-print-charts>🖨 Print charts only</button></div><p class="note">Cooking mode shows one section at a time in large text and keeps the screen awake while your hands are busy.</p></div><div class="rail-card"><h3>Safe internal temperatures</h3><table><thead><tr><th>Food</th><th>Safe temp</th></tr></thead><tbody><tr><td>Poultry (all)</td><td><b>165°F / 74°C</b></td></tr><tr><td>Ground meats</td><td><b>160°F / 71°C</b></td></tr><tr><td>Beef, pork, lamb (cuts)</td><td><b>145°F / 63°C</b> + rest</td></tr><tr><td>Fish &amp; shellfish</td><td><b>145°F / 63°C</b></td></tr></tbody></table><p class="note">USDA minimums. An instant-read thermometer is the only reliable check — color and timing are not.</p></div><div class="rail-card"><h3>Save &amp; follow</h3><p>Pin this chart to your board so it is in your kitchen next time.</p><div class="links"><a href="https://pinterest.com/pin/create/button/?url=https%3A%2F%2Fcrispcharts.me%2Ftools%2Fair-fryer-guide-generator.html&media=https%3A%2F%2Fcrispcharts.me%2Fog-default.png&description=Air%20Fryer%20Guide%20Generator%20%E2%80%94%20Pick%20any%20food%20and%20state%20%E2%80%94%20get%20the%20complete%20air%20fryer%20guide." rel="nofollow noopener" target="_blank">📌 Pin it</a><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fcrispcharts.me%2Ftools%2Fair-fryer-guide-generator.html&text=Air%20Fryer%20Guide%20Generator" rel="nofollow noopener" target="_blank">𝕏 Post</a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcrispcharts.me%2Ftools%2Fair-fryer-guide-generator.html" rel="nofollow noopener" target="_blank">f Share</a><a href="/atom.xml">📰 RSS</a><a href="/">🗂 All charts</a></div></div></aside>
 </div>
 </main>
@@ -455,12 +431,13 @@ function ccToggleTheme() {
 (function () {
   'use strict';
 
-  /* ───────── محرك الحساب — دالة نقية: نفس المدخلات = نفس الدليل دائماً ───────── */
+  /* ═══ المحرك الحتمي — نفس المدخلات = نفس الجواب دائماً ═══ */
 
-  var DATA = null;
-  var sel = { food: null, state: null, qty: null, style: 'basket', watt: 'std', preheat: true, breaded: false };
-  var catFilter = null;
-  var shown = 24;
+  var DATA = null, INDEX = null;
+  var sel = { food: null, state: null, qty: null, unit: null, style: null, watt: null, goal: null, preheat: true, breaded: false };
+  var pending = null;   // السؤال الحالي: food | state | amount | fryer | goal
+  var cand = null;      // مرشحات بانتظار التوضيح
+  var autoItems = [], autoIdx = -1;
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -472,6 +449,25 @@ function ccToggleTheme() {
   function clamp(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
   function fmtT(t) { return (t % 1 === 0) ? String(t) : t.toFixed(1); }
   function toC(f) { return Math.round((f - 32) * 5 / 9); }
+  function norm(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[^a-z0-9\s.]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function lev(a, b) {
+    if (a === b) return 0;
+    var m = a.length, n = b.length;
+    if (!m || !n) return m + n;
+    var prev = [], i, j;
+    for (j = 0; j <= n; j++) prev[j] = j;
+    for (i = 1; i <= m; i++) {
+      var cur = [i];
+      for (j = 1; j <= n; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
 
   function interp(anchors, qty) {
     if (!anchors || !anchors.length) return null;
@@ -495,9 +491,8 @@ function ccToggleTheme() {
     var st = DATA.states[stateId] || DATA.states.fresh;
     var temp = food.temp, tmin = food.time[0], tmax = food.time[1], adj = [];
 
-    var scale = null;
     if (qty != null && food.anchors && food.anchors.length > 1) {
-      scale = interp(food.anchors, qty);
+      var scale = interp(food.anchors, qty);
       if (scale) { tmin = scale[0]; tmax = scale[1]; }
     }
 
@@ -506,181 +501,345 @@ function ccToggleTheme() {
     if (stateId !== food.base_state && (stateId === 'frozen' || stateId === 'marinated' || stateId === 'breaded')) {
       if (factor !== 1) { tmin *= factor; tmax *= factor; }
       if (st.add_min) { tmin += st.add_min; tmax += st.add_min; }
-      if (st.temp_delta) { temp += st.temp_delta; }
-      if (stateId === 'frozen') adj.push('Frozen, cooked from raw: about 50% more time (+' + st.add_min + ' min).');
-      if (stateId === 'marinated') adj.push('Marinated: about 10% more time — surface moisture slows browning.');
-      if (stateId === 'breaded') adj.push('Pre-breaded at home: 5°F lower so the crumbs color before the center is done.');
-    } else if (isBaseFrozen) {
-      adj.push('Straight from the bag — no thawing.');
+      if (st.temp_delta) temp += st.temp_delta;
+      if (stateId === 'frozen') adj.push('Frozen, cooked from raw: about 50% more time (+' + (st.add_min || 0) + ' min).');
+      if (stateId === 'marinated') adj.push('Marinated: about 10% more time - surface moisture slows browning.');
+      if (stateId === 'breaded') adj.push('Breaded at home: 5°F lower so the crumbs color before the center is done.');
     }
 
     if (o.breaded && food.breaded && stateId === 'fresh') {
       temp -= 5; tmin *= 1.05; tmax *= 1.05;
       adj.push('Breading option on: 5°F lower, slightly longer.');
     }
-    if (o.style === 'oven') { tmin *= 1.10; tmax *= 1.12; adj.push('Oven-style air fryer: gentler air, ~10% more time.'); }
-    if (o.watt === 'low') { tmin *= 1.12; tmax *= 1.12; adj.push('Compact / low-watt model: ~12% more time.'); }
-    if (o.watt === 'high') { tmin *= 0.95; tmax *= 0.95; adj.push('High-power model: check ~5% early.'); }
-    if (!o.preheat) { tmin += 2; tmax += 3; adj.push('Starting cold (no preheat): +2–3 min.'); }
+    if (o.style === 'oven') { tmin *= 1.10; tmax *= 1.12; adj.push('Oven-style air fryer: gentler air, about 10% more time.'); }
+    if (o.watt === 'low') { tmin *= 1.12; tmax *= 1.12; adj.push('Compact / low-watt model: about 12% more time.'); }
+    if (o.watt === 'high') { tmin *= 0.95; tmax *= 0.95; adj.push('High-power model: check about 5% early.'); }
+    if (o.preheat === false) { tmin += 2; tmax += 3; adj.push('Starting cold (no preheat): +2-3 min.'); }
+
+    var goal = DATA.goals[o.goal || 'none'] || DATA.goals.none;
+    if (goal.temp_delta) temp += goal.temp_delta;
+    if (goal.factor && goal.factor !== 1) {
+      tmin *= goal.factor; tmax *= goal.factor;
+      adj.push(goal.label + ': ' + (goal.temp_delta > 0 ? '+' : '') + goal.temp_delta + '°F, time ×' + goal.factor + '.');
+    }
 
     var maxT = food.max_time || 60;
     tmin = clamp(r05(tmin), 2, maxT);
     tmax = clamp(r05(tmax), tmin, maxT);
+    temp = clamp(Math.round(temp), 250, 450);
 
     var internal = null, rest = null;
     if (stateId === 'reheat') internal = 165;
     else if (food.internal) internal = food.internal;
     if (food.rest) rest = food.rest;
 
-    return { temp: temp, tmin: tmin, tmax: tmax, internal: internal, rest: rest, adj: adj, st: st };
+    return { temp: temp, tmin: tmin, tmax: tmax, internal: internal, rest: rest, adj: adj, st: st, goalNote: (goal.factor !== 1 || goal.temp_delta) ? goal.note : '' };
   }
 
-  /* ───────── بناء الدليل (نصوص) ───────── */
-
   function buildSteps(food, g, o) {
-    var tplName = DATA.category_template[food.cat] || 'protein';
-    var tpl = DATA.templates[tplName];
+    var tpl = DATA.templates[DATA.category_template[food.cat] || 'protein'] || [];
     var mid = r05((g.tmin + g.tmax) / 2);
     var early = Math.max(1, r05(g.tmin * 0.6));
     var flip = (food.cat === 'vegetables' || food.cat === 'potatoes' || food.cat === 'frozen' || food.cat === 'baking')
       ? ', shaking the basket at the midpoint' : ', flipping at the midpoint';
-    var preheatNote = o.preheat ? ' (or as it heats, if you skipped preheating)' : '';
-    var restNote = g.rest ? 'Rest ' + fmtT(g.rest) + ' min before serving — carryover finishes the job.'
-      : 'Serve immediately.';
-    var out = [];
+    var preheatNote = o.preheat === false ? ' (you said no preheat - add the 2-3 min already included)' : '';
+    var restNote = g.rest ? 'Rest ' + fmtT(g.rest) + ' min before serving - carryover finishes the job.' : 'Serve immediately.';
     if (food.steps && food.steps.length) {
-      out = food.steps.map(function (s) {
-        return s.replace('{temp_c}', toC(g.temp)).replace('{temp}', g.temp)
-          .replace('{tmin}', fmtT(g.tmin)).replace('{tmax}', fmtT(g.tmax));
+      return food.steps.map(function (s) {
+        return s.replace(/\{temp_c\}/g, toC(g.temp)).replace(/\{temp\}/g, g.temp)
+          .replace(/\{tmin\}/g, fmtT(g.tmin)).replace(/\{tmax\}/g, fmtT(g.tmax));
       });
-      return out;
     }
-    var internalC = g.internal ? toC(g.internal) : '';
+    var out = [];
     for (var i = 0; i < tpl.length; i++) {
       out.push(tpl[i]
-        .replace('{preheat_note}', preheatNote)
-        .replace('{temp}', g.temp).replace('{temp_c}', toC(g.temp))
-        .replace('{tmin}', fmtT(g.tmin)).replace('{tmax}', fmtT(g.tmax))
-        .replace('{flip_note}', flip)
-        .replace('{early}', fmtT(early))
-        .replace('{internal}', g.internal ? g.internal : '—')
-        .replace('{internal_c}', internalC)
-        .replace('{rest_note}', restNote)
-        .replace('{check}', food.check || 'golden and tender'));
+        .replace(/\{preheat_note\}/g, preheatNote)
+        .replace(/\{temp\}/g, g.temp).replace(/\{temp_c\}/g, toC(g.temp))
+        .replace(/\{tmin\}/g, fmtT(g.tmin)).replace(/\{tmax\}/g, fmtT(g.tmax))
+        .replace(/\{flip_note\}/g, flip)
+        .replace(/\{early\}/g, fmtT(early))
+        .replace(/\{internal\}/g, g.internal ? g.internal : '-')
+        .replace(/\{internal_c\}/g, g.internal ? toC(g.internal) : '')
+        .replace(/\{rest_note\}/g, restNote)
+        .replace(/\{check\}/g, food.check || 'golden and tender'));
     }
     return out;
   }
 
-  function statcard(num, lbl, cls) {
-    return '<div class="statcard' + (cls ? ' ' + cls : '') + '" role="listitem">' +
-      '<span class="num">' + esc(num) + '</span><span class="lbl">' + esc(lbl) + '</span></div>';
-  }
+  /* ═══ مطابقة الأصناف — حتمية بالكامل (بدائل + أجزاء كلمات + تصحيح أخطاء بسيط) ═══ */
 
-  function renderGuide(food, g) {
-    var o = sel;
-    var foodUrl = food.link && DATA.links && DATA.links[food.link] ? DATA.links[food.link] : DATA.fallback_link;
-    var steps = buildSteps(food, g, o);
-    var stateLabel = g.st.label || 'Fresh';
-    var html = '';
+  var ALIAS = {
+    'french-fries': ['fries', 'chips', 'french fries', 'frozen fries', 'potato fries'],
+    'curly-fries': ['curly fries'], 'waffle-fries': ['waffle fries'],
+    'sweet-potato-fries-frozen': ['sweet potato fries', 'sweet potato fries frozen'],
+    'tater-tots': ['tots', 'tater tots', 'potato tots'],
+    'hash-brown-patties': ['hash browns', 'hash brown patties', 'frozen hash browns'],
+    'mozzarella-sticks': ['mozzarella sticks', 'mozz sticks', 'cheese sticks', 'cheese sticks frozen'],
+    'pizza-rolls': ['pizza rolls'], 'bagel-bites': ['bagel bites'],
+    'corn-dogs': ['corn dog', 'corn dogs'], 'mini-corn-dogs': ['mini corn dogs', 'little corn dogs'],
+    'onion-rings': ['onion rings'], 'jalapeno-poppers': ['poppers', 'jalapeno poppers', 'jalapeno', 'jalapenos'],
+    'spring-rolls': ['spring rolls', 'egg rolls', 'spring roll', 'egg roll'],
+    'samosas-frozen': ['samosas', 'samosa'], 'empanadas-frozen': ['empanadas', 'empanada'],
+    'taquitos-frozen': ['taquitos', 'flautas', 'taquito'],
+    'dumplings-frozen': ['dumplings', 'potstickers', 'pot stickers', 'gyoza', 'dumpling'],
+    'fish-sticks': ['fish sticks', 'fish fingers'],
+    'breaded-fish-fillets': ['breaded fish', 'battered fish', 'fish fillets frozen', 'battered fish fillets'],
+    'nuggets-frozen': ['nuggets', 'chicken nuggets', 'nugget'],
+    'strips-frozen': ['frozen chicken strips', 'frozen chicken tenders', 'breaded chicken strips'],
+    'chicken-patties-frozen': ['chicken patties', 'chicken patty', 'chicken burger frozen'],
+    'mac-bites-frozen': ['mac bites', 'mac and cheese bites', 'mac cheese bites'],
+    'veggie-burgers-frozen': ['veggie burger', 'veggie burgers', 'plant based burger', 'vegan burger'],
+    'broccoli': ['broccoli', 'brocc'], 'cauliflower': ['cauliflower', 'cauli'],
+    'brussels-sprouts': ['brussels sprouts', 'brussels', 'sprouts'],
+    'carrots': ['carrots', 'carrot'], 'baby-carrots': ['baby carrots'],
+    'asparagus': ['asparagus'], 'green-beans': ['green beans', 'string beans'],
+    'zucchini': ['zucchini', 'courgette', 'zucch'], 'bell-peppers': ['bell peppers', 'peppers', 'capsicum', 'pepper strips'],
+    'mushrooms': ['mushrooms', 'mushroom'], 'eggplant': ['eggplant', 'aubergine'],
+    'okra': ['okra'], 'corn-on-cob': ['corn', 'corn on the cob', 'corn cob', 'corn on cob'],
+    'cherry-tomatoes': ['cherry tomatoes', 'tomatoes', 'tomato'],
+    'butternut-cubes': ['butternut', 'butternut squash', 'squash cubes'],
+    'parsnips': ['parsnips', 'parsnip'], 'beets': ['beets', 'beetroot', 'beet'],
+    'cabbage-wedges': ['cabbage', 'cabbage wedges'],
+    'potato-whole': ['baked potato', 'baked potatoes', 'jacket potato', 'whole potato', 'russet potato'],
+    'potato-wedges': ['wedges', 'potato wedges', 'potato wedges fresh'],
+    'sweet-potato-whole': ['sweet potato', 'baked sweet potato', 'whole sweet potato'],
+    'sweet-potato-cubes': ['sweet potato cubes', 'sweet potato chunks'],
+    'baby-potatoes': ['baby potatoes', 'new potatoes', 'mini potatoes'],
+    'potato-skins': ['potato skins', 'potato skin'],
+    'breakfast-links': ['breakfast links', 'breakfast sausage', 'breakfast sausage links'],
+    'sausage-patties': ['sausage patties', 'sausage patty'],
+    'eggs-sunny': ['fried egg', 'fried eggs', 'sunny side up', 'sunny eggs', 'egg in ramekin'],
+    'eggs-hard': ['hard boiled eggs', 'boiled eggs', 'hard boiled egg', 'hardboiled eggs', 'boiled egg'],
+    'eggs-scrambled': ['scrambled eggs', 'scrambled egg', 'omelette'],
+    'hash-brown-fresh': ['shredded hash browns', 'fresh hash browns', 'hash brown patty fresh'],
+    'french-toast-sticks': ['french toast', 'french toast sticks'],
+    'canned-biscuits': ['biscuits', 'canned biscuits', 'tube biscuits', 'american biscuits'],
+    'cookies': ['cookies', 'cookie', 'cookie dough'],
+    'cinnamon-rolls': ['cinnamon rolls', 'cinnamon roll', 'cinnabon'],
+    'crescent-rolls': ['crescent rolls', 'crescents', 'croissant dough'],
+    'garlic-bread-frozen': ['garlic bread', 'garlic bread frozen', 'garlic loaf'],
+    'garlic-bread-fresh': ['fresh garlic bread', 'garlic baguette'],
+    'pizza-frozen': ['frozen pizza', 'pizza frozen', 'personal pizza'],
+    'pretzels-frozen': ['soft pretzels', 'pretzels', 'pretzel'],
+    'churros-frozen': ['churros', 'churro'],
+    'naan-warm': ['naan', 'pita', 'flatbread', 'naan bread'],
+    'apple-hand-pies': ['hand pies', 'apple hand pies', 'turnovers'],
+    'pizza-slice': ['pizza slice', 'leftover pizza', 'pizza leftover', 'day old pizza'],
+    'fried-chicken-leftover': ['fried chicken', 'kfc chicken', 'leftover fried chicken'],
+    'fries-leftover': ['leftover fries', 'day old fries'],
+    'steak-leftover': ['leftover steak', 'reheat steak'],
+    'mac-portion': ['mac and cheese', 'mac and cheese leftovers', 'leftover mac and cheese'],
+    'casserole-portion': ['casserole', 'casserole leftovers', 'leftover casserole'],
+    'roast-veg-leftover': ['leftover vegetables', 'leftover roasted vegetables', 'roasted vegetables leftover'],
+    'spring-rolls-leftover': ['leftover spring rolls'],
+    'baked-apples': ['baked apples', 'baked apple', 'apple baked'],
+    'banana-halves': ['banana', 'bananas', 'caramelized banana'],
+    'pineapple-rings': ['pineapple', 'pineapple rings', 'pineapple ring'],
+    'peach-halves': ['peaches', 'peach', 'peach halves'],
+    'brownie-warm': ['brownie', 'brownies', 'leftover brownie'],
+    'tofu': ['tofu', 'crispy tofu'],
+    'chickpeas': ['chickpeas', 'chickpea', 'garbanzo', 'garbanzos', 'roasted chickpeas'],
+    'halloumi': ['halloumi', 'halloumi cheese', 'halloumi slices'],
+    'grilled-cheese': ['grilled cheese', 'grilled cheese sandwich', 'cheese toastie', 'toastie'],
+    'quesadilla': ['quesadilla', 'quesadillas'],
+    'falafel-frozen': ['falafel', 'falafels'],
+    'chicken-breast': ['chicken breast', 'chicken breasts', 'boneless chicken breast', 'chicken boob'],
+    'chicken-thighs-boneless': ['boneless thighs', 'boneless chicken thighs', 'chicken thigh fillets'],
+    'chicken-thighs-bone-in': ['bone in thighs', 'bone in chicken thighs', 'thighs bone in'],
+    'chicken-drumsticks': ['drumsticks', 'drumstick', 'chicken legs', 'chicken leg'],
+    'chicken-wings': ['wings', 'wing', 'chicken wings', 'buffalo wings', 'hot wings'],
+    'chicken-tenders': ['tenders', 'chicken tenders', 'chicken strips fresh', 'chicken fingers'],
+    'whole-chicken': ['whole chicken', 'whole bird', 'rotisserie chicken raw'],
+    'turkey-cutlets': ['turkey', 'turkey cutlets', 'turkey breast', 'turkey steaks'],
+    'ground-chicken-burgers': ['ground chicken', 'chicken burgers', 'turkey burgers', 'poultry burgers'],
+    'chicken-nuggets-fresh': ['homemade nuggets', 'fresh nuggets', 'homemade chicken nuggets'],
+    'steak': ['steak', 'sirloin', 'ribeye', 'rib eye', 'ny strip', 'new york strip', 'beef steak'],
+    'burgers': ['burger', 'burgers', 'hamburger', 'hamburgers', 'beef burger', 'beef burgers', 'beef patty'],
+    'meatballs': ['meatballs', 'meatball', 'kofta balls'],
+    'beef-kabobs': ['kabobs', 'kabob', 'beef kabobs', 'beef cubes', 'beef skewers'],
+    'roast-beef': ['roast beef', 'beef roast', 'small roast'],
+    'meatloaf-mini': ['meatloaf', 'mini meatloaf', 'meatloaves'],
+    'salisbury-steak': ['salisbury', 'salisbury steak', 'salisbury patties'],
+    'hot-dogs': ['hot dogs', 'hotdog', 'hotdogs', 'frankfurter', 'weiners'],
+    'pork-chops': ['pork chops', 'pork chop', 'pork loin chop'],
+    'pork-tenderloin': ['tenderloin', 'pork tenderloin', 'pork fillet'],
+    'pork-medallions': ['medallions', 'pork medallions'],
+    'pork-belly-slices': ['pork belly', 'pork belly slices', 'pork strips'],
+    'sausage-fresh-links': ['fresh sausage', 'sausage links', 'italian sausage', 'brats', 'bratwurst'],
+    'bacon': ['bacon', 'bacon strips', 'regular bacon'],
+    'bacon-thick': ['thick bacon', 'thick cut bacon', 'thick cut'],
+    'ham-slices': ['ham', 'ham slices', 'gammon'],
+    'country-ribs': ['country ribs', 'country style ribs'],
+    'spare-ribs': ['ribs', 'spare ribs', 'baby back ribs', 'pork ribs', 'rib rack'],
+    'lamb-chops': ['lamb chops', 'lamb chop', 'lamb cutlets'],
+    'lamb-kofta': ['kofta', 'lamb kofta', 'lamb kebab', 'lamb kebabs'],
+    'lamb-cubes': ['lamb cubes', 'diced lamb'],
+    'salmon': ['salmon', 'salmon fillet', 'salmon fillets', 'salmon portion'],
+    'cod': ['cod', 'haddock', 'white fish', 'cod fillet', 'whitefish'],
+    'tilapia': ['tilapia', 'tilapia fillet'],
+    'shrimp': ['shrimp', 'shrimps', 'prawns', 'prawn', 'scampi', 'shrimp large'],
+    'scallops': ['scallops', 'scallop', 'sea scallops'],
+    'tuna-steak': ['tuna', 'tuna steak', 'tuna steaks', 'ahi tuna'],
+    'crab-cakes': ['crab cakes', 'crab cake', 'crab patties'],
+    'lobster-tail': ['lobster', 'lobster tail', 'lobster tails'],
+    'calamari-frozen': ['calamari', 'squid', 'calamari rings', 'fried calamari']
+  };
 
-    html += '<div class="gb-title"><span class="gb-fname">' + esc(food.name) + '</span>' +
-      '<span class="gb-catp">' + esc(food.cat_icon + ' ' + stateLabel) + '</span></div>';
-
-    html += '<div class="statcards" role="list" aria-label="Key settings">';
-    html += statcard(g.temp + '°F / ' + toC(g.temp) + '°C', 'Set temp');
-    html += statcard(fmtT(g.tmin) + '–' + fmtT(g.tmax) + ' min', 'Cook time');
-    if (g.internal) html += statcard(g.internal + '°F / ' + toC(g.internal) + '°C', 'Safe internal', 'safe');
-    if (g.rest) html += statcard(fmtT(g.rest) + ' min', 'Rest', 'hot');
-    html += '</div>';
-
-    if (g.adj.length) {
-      html += '<div class="gb-adj"><b>Why these numbers:</b><ul>';
-      for (var i = 0; i < g.adj.length; i++) html += '<li>' + esc(g.adj[i]) + '</li>';
-      html += '</ul></div>';
-    }
-
-    html += '<ol class="gb-steps">';
-    for (var s = 0; s < steps.length; s++) html += '<li>' + esc(steps[s]) + '</li>';
-    html += '</ol>';
-
-    if (food.check) html += '<div class="gb-box doneness"><b>How you know it is done:</b> ' + esc(food.check) + '.</div>';
-    if (g.internal) {
-      html += '<div class="gb-box safety"><b>USDA safety line:</b> verify ' + g.internal + '°F / ' + toC(g.internal) +
-        '°C with an instant-read thermometer in the thickest piece — the clock is a guide, the thermometer is the judge.</div>';
-    }
-    if (g.st.note) html += '<div class="gb-box doneness"><b>' + esc(g.st.label) + ':</b> ' + esc(g.st.note) + '</div>';
-
-    if (food.tips && food.tips.length) {
-      html += '<ul class="gb-tips">';
-      for (var t = 0; t < food.tips.length; t++) html += '<li>' + esc(food.tips[t]) + '</li>';
-      html += '</ul>';
-    }
-
-    var linkTxt = foodUrl === DATA.fallback_link ? 'Browse the full cooking-times chart' : 'Open the full ' + food.name + ' chart';
-    html += '<div class="gb-actions">' +
-      '<button type="button" class="gb-act primary" data-gb-copy-guide>📋 Copy this guide</button>' +
-      '<button type="button" class="gb-act" data-gb-copy-link>🔗 Copy link to this guide</button>' +
-      '<button type="button" class="gb-act" data-gb-print>🖨 Print</button>' +
-      '<a class="gb-act" href="' + esc(foodUrl) + '">📖 ' + esc(linkTxt) + '</a>' +
-      '<button type="button" class="gb-act" data-gb-pin>📌 Pin it</button>' +
-      '</div>';
-
-    html += '<p class="gb-ver">Data v' + esc(DATA.version) + ' · calculated from USDA safe-temperature tables and tested charts — ' +
-      esc(DATA.disclaimer) + '</p>';
-
-    return html;
-  }
-
-  /* ───────── الخطوات التفاعلية ───────── */
-
-  function renderCatalog() {
-    var q = ($('gb-q1').getAttribute('data-q') || '').toLowerCase().trim();
-    var foods = DATA.foods.filter(function (f) {
-      if (catFilter && f.cat !== catFilter) return false;
-      if (!q) return true;
-      return (f.name + ' ' + f.id + ' ' + f.cat_label).toLowerCase().indexOf(q) !== -1;
+  function buildIndex() {
+    INDEX = [];
+    DATA.foods.forEach(function (f) {
+      var texts = [{ t: norm(f.name), w: 92 }];
+      var short = norm(f.name.replace(/\(.*?\)/g, ''));
+      if (short && short !== texts[0].t) texts.push({ t: short, w: 92 });
+      (ALIAS[f.id] || []).forEach(function (a) { texts.push({ t: norm(a), w: 100 }); });
+      INDEX.push({ f: f, texts: texts });
     });
-    var box = $('gb-foods');
-    if (!foods.length) {
-      box.innerHTML = '<div class="gb-note">No match — try a shorter word, or browse a category.</div>';
-      return;
-    }
-    var list = foods.slice(0, shown);
-    var html = '';
-    for (var i = 0; i < list.length; i++) {
-      var f = list[i];
-      html += '<button type="button" class="gb-food" data-id="' + esc(f.id) + '"' +
-        (sel.food === f.id ? ' aria-pressed="true"' : '') + '>' +
-        '<span class="ico">' + esc(f.cat_icon) + '</span><span>' + esc(f.name) + '</span></button>';
-    }
-    if (foods.length > shown) {
-      html += '<button type="button" class="gb-more" id="gb-more">Show all ' + foods.length + ' matches…</button>';
-    }
-    box.innerHTML = html;
-    var more = $('gb-more');
-    if (more) more.addEventListener('click', function () { shown = 999; renderCatalog(); });
-    var btns = box.querySelectorAll('.gb-food');
-    for (var b = 0; b < btns.length; b++) {
-      btns[b].addEventListener('click', function () { pickFood(this.getAttribute('data-id')); });
-    }
   }
 
-  function renderCats() {
-    var html = '<button type="button" class="gb-cat" data-cat=""' + (!catFilter ? ' aria-pressed="true"' : '') + '>All</button>';
-    for (var i = 0; i < DATA.categories.length; i++) {
-      var c = DATA.categories[i];
-      html += '<button type="button" class="gb-cat" data-cat="' + esc(c.id) + '"' +
-        (catFilter === c.id ? ' aria-pressed="true"' : '') + '>' + esc(c.icon + ' ' + c.label) + '</button>';
-    }
-    $('gb-cats').innerHTML = html;
-    var cats = $('gb-cats').querySelectorAll('.gb-cat');
-    for (var k = 0; k < cats.length; k++) {
-      cats[k].addEventListener('click', function () {
-        catFilter = this.getAttribute('data-cat') || null;
-        shown = 24;
-        renderCats(); renderCatalog();
+  function tokenCover(q, t) {
+    var qt = q.split(' '), tt = t.split(' ');
+    var hit = 0;
+    qt.forEach(function (tok) {
+      var ok = tt.some(function (x) {
+        return x === tok || (tok.length > 3 && x.indexOf(tok) === 0) ||
+               (tok.length > 4 && x.length > 4 && lev(tok, x) <= 2);
       });
+      if (ok) hit++;
+    });
+    return { full: hit === qt.length, partial: qt.length > 1 && hit >= qt.length - 1 };
+  }
+
+  function matchFoodRaw(text) {
+    var q = norm(text);
+    if (!q) return { type: 'none' };
+    if (DATA.foodsById[q]) return { type: 'exact', food: DATA.foodsById[q] };
+    var hits = [];
+    INDEX.forEach(function (e) {
+      var best = 0;
+      e.texts.forEach(function (x) {
+        var s = 0;
+        if (x.t === q) s = x.w;
+        else if (q.indexOf(x.t) === 0 || x.t.indexOf(q) === 0) s = 80 + Math.min(x.t.length, q.length) * 0.4;
+        else if (x.t.indexOf(q) !== -1) s = 74;
+        else if (q.indexOf(x.t) !== -1) s = 72;
+        if (!s) {
+          var c = tokenCover(q, x.t);
+          if (c.full) s = 86;
+          else if (c.partial) s = 58;
+        }
+        if (s > best) best = s;
+      });
+      if (best > 0) hits.push({ f: e.f, s: best });
+    });
+    if (!hits.length) return { type: 'none' };
+    hits.sort(function (a, b) { return b.s - a.s; });
+    var uniq = [], seen = {};
+    hits.forEach(function (h) { if (!seen[h.f.id]) { seen[h.f.id] = 1; uniq.push(h); } });
+    var top = uniq[0], second = uniq[1];
+    if (top.s >= 95 || (top.s >= 80 && (!second || top.s - second.s >= 12))) return { type: 'exact', food: top.f };
+    if (top.s >= 55) return { type: 'candidates', foods: uniq.slice(0, 3).map(function (h) { return h.f; }) };
+    return { type: 'none' };
+  }
+
+  /* ═══ فهم الجملة الكاملة — حتمي ═══ */
+
+  var RX = {
+    qty: /(\d+(?:\.\d+)?)\s*(?:-|to)?\s*(lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|pieces?|pcs?|pc|dozen)\b/,
+    bare: /\b(\d{1,3}(?:\.\d+)?)\b/,
+    watt: /(\d{3,4})\s*w\b/,
+    skip: /^(idk|i do not know|i dont know|dunno|skip|any|anything|whatever|na|n a|just cook|you decide|default|no)[\s!.?]*$/,
+    reset: /^(reset|start over|restart|another one|new one|clear|again|new)[\s!.?]*$/
+  };
+  function stateFromText(t) {
+    if (/\b(frozen|frzn|freezer|from frozen|straight from the freezer)\b/.test(t)) return 'frozen';
+    if (/\b(leftovers?|reheat\w*|day[- ]?old|yesterdays?|warming up)\b/.test(t)) return 'reheat';
+    if (/\b(marinat\w*)\b/.test(t)) return 'marinated';
+    if (/\b(breaded|crumbed|battered|in crumbs)\b/.test(t)) return 'breaded';
+    if (/\b(fresh|thawed|defrosted|raw|not frozen)\b/.test(t)) return 'fresh';
+    return null;
+  }
+  function goalFromText(t) {
+    if (/\b(crisp\w*|crunch\w*|extra crispy)\b/.test(t)) return 'crispy';
+    if (/\b(quick|fast|hurry|rush|asap|in a rush)\b/.test(t)) return 'quick';
+    if (/\b(juicy|moist|tender|succulent)\b/.test(t)) return 'juicy';
+    return null;
+  }
+  function fryerFromText(t) {
+    var out = {};
+    if (/\b(oven[- ]?style|oven type|toaster oven|big oven|air fryer oven)\b/.test(t)) out.style = 'oven';
+    else if (/\bbasket\b|\bdrawer\b|\bbasket style\b/.test(t)) out.style = 'basket';
+    var w = t.match(RX.watt);
+    if (w) out.watt = parseInt(w[1], 10) < 1000 ? 'low' : (parseInt(w[1], 10) > 1700 ? 'high' : 'std');
+    else if (/\b(compact|small|mini|tiny)\b/.test(t)) out.watt = 'low';
+    else if (/\b(xl|dual|powerful|high[- ]?power|big)\b/.test(t)) out.watt = 'high';
+    return out;
+  }
+  function unitConvert(n, u) {
+    if (u === 'g') return { qty: r05(n / 28.35), unit: 'oz' };
+    if (u === 'kg' || u === 'kilo' || u === 'kilos') return { qty: r05(n * 2.2046), unit: 'lb' };
+    if (u === 'dozen') return { qty: 12, unit: 'piece' };
+    if (/^(piece|pieces|pcs|pc)$/.test(u)) return { qty: n, unit: 'piece' };
+    if (/^(oz|ounces?)$/.test(u)) return { qty: n, unit: 'oz' };
+    return { qty: n, unit: 'lb' };
+  }
+  function parseUtterance(text) {
+    var out = {};
+    var t = norm(text);
+    if (!t) return out;
+    if (RX.skip.test(t)) { out.skip = true; return out; }
+    if (RX.reset.test(t)) { out.reset = true; return out; }
+
+    var m = t.match(RX.qty);
+    if (m) { var c = unitConvert(parseFloat(m[1]), m[2]); out.qty = c.qty; out.unit = c.unit; }
+
+    var stt = stateFromText(t); if (stt) out.state = stt;
+    var gl = goalFromText(t); if (gl) out.goal = gl;
+    var fr = fryerFromText(t);
+    if (fr.style) out.style = fr.style;
+    if (fr.watt) out.watt = fr.watt;
+    if (/\bno preheat\w*|without preheat\w*|cold start|did not preheat|do not preheat\b/.test(t)) out.preheat = false;
+    else if (/\bpreheat\w*\b/.test(t)) out.preheat = true;
+
+    var stripped = t
+      .replace(/(\d+(?:\.\d+)?)\s*(?:-|to)?\s*(lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|pieces?|pcs?|pc|dozen)\b/g, ' ')
+      .replace(/\b(i|i am|im|want|would like|need|make|cook|cooking|air fry|airfry|fry|frying|please|hi|hello|hey|some|the|a|an|my|its|it is|of|for|in|on|and|with|how long|how to|do i|you|me|guide|settings?|temperature|temp|time)\b/g, ' ')
+      .replace(/\b(frozen|frzn|freezer|leftovers?|reheat\w*|marinat\w*|breaded|crumbed|battered|fresh|thawed|defrosted|raw|not frozen|day[- ]?old|yesterdays?|warming up|in crumbs)\b/g, ' ')
+      .replace(/\b(crisp\w*|crunch\w*|extra crispy|quick|fast|hurry|rush|asap|juicy|moist|tender|succulent|in a rush)\b/g, ' ')
+      .replace(/\b(oven[- ]?style|oven type|toaster oven|big oven|air fryer oven|basket|drawer|basket style|compact|small|mini|tiny|xl|dual|powerful|high[- ]?power|no preheat\w*|without preheat\w*|cold start|did not preheat|do not preheat|preheat\w*)\b/g, ' ')
+      .replace(/\b(\d{3,4})\s*w\b/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+    if (stripped && stripped.length >= 3) {
+      var fm = matchFoodRaw(stripped);
+      if (fm.type === 'exact') out.food = fm.food;
+      else if (fm.type === 'candidates') {
+        /* حسم حتمي: إن كانت الحالة المفهومة من الجملة تطابق مرشحاً واحداً فاختره */
+        var autoF = out.state ? fm.foods.filter(function (f) { return f.base_state === out.state; }) : [];
+        if (autoF.length === 1) out.food = autoF[0];
+        else out.candidates = fm.foods;
+      }
     }
+    return out;
+  }
+
+  /* ═══ الدردشة ═══ */
+
+  var logEl, inEl;
+
+  function scrollLog() { logEl.scrollTop = logEl.scrollHeight; }
+  function botSay(html, widgetHtml) {
+    var d = document.createElement('div');
+    d.className = 'gc-msg bot';
+    d.innerHTML = html + (widgetHtml || '');
+    logEl.appendChild(d);
+    scrollLog();
+    return d;
+  }
+  function userSay(text) {
+    var d = document.createElement('div');
+    d.className = 'gc-msg user';
+    d.textContent = text;
+    logEl.appendChild(d);
+    scrollLog();
   }
 
   function validStates(food) {
@@ -688,177 +847,147 @@ function ccToggleTheme() {
     for (var k in food.states) if (k !== food.base_state && DATA.states[k]) ids.push(k);
     return ids;
   }
+  function stateLabel(id) { return (DATA.states[id] || {}).label || id; }
 
-  function pickFood(id) {
-    sel.food = id; sel.state = null; sel.qty = null;
-    var food = DATA.foodsById[id];
-    renderCatalog();
-    renderStateStep(food);
-    renderQtyStep(food, true);
-    updateGuide();
-    $('gb-q2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function selWidget(opts, current, key) {
+    var h = '<span class="gc-widgets"><select class="gc-sel" data-key="' + key + '">';
+    opts.forEach(function (o) {
+      h += '<option value="' + esc(o.v) + '"' + (current === o.v ? ' selected' : '') + '>' + esc(o.l) + '</option>';
+    });
+    h += '</select></span>';
+    return h;
+  }
+  function bindSel(container) {
+    var s = container.querySelector('select.gc-sel');
+    if (!s) return;
+    s.addEventListener('change', function () {
+      userSay(s.options[s.selectedIndex].text);
+      applyAnswer(s.getAttribute('data-key'), s.value);
+    });
   }
 
-  function renderStateStep(food) {
-    var ids = validStates(food);
-    var single = ids.length === 1;
-    sel.state = sel.state && ids.indexOf(sel.state) !== -1 ? sel.state : food.base_state;
-    var html = '<p class="gb-q"><span class="gb-n">2</span>' +
-      (single ? 'State' : esc(DATA.states[ids[0]].q || 'What state is it in?')) + '</p>';
-    if (single && food.base_state === 'frozen') {
-      html += '<p class="gb-hint">This food is designed to cook straight from the freezer — no thawing.</p>';
+  function applyAnswer(key, value) {
+    pending = null; cand = null;
+    if (key === 'state') sel.state = value;
+    if (key === 'style') sel.style = value;
+    if (key === 'watt') sel.watt = value;
+    if (key === 'goal') sel.goal = value;
+    if (key === 'amount') {
+      var n = parseFloat(value);
+      sel.qty = isNaN(n) || n <= 0 ? null : n;
+      sel.unit = sel.food ? sel.food.unit : null;
     }
-    if (single && food.base_state === 'reheat') {
-      html += '<p class="gb-hint">This guide is for bringing leftovers back to life.</p>';
+    proceed();
+  }
+
+  function ask(key) {
+    pending = key;
+    if (key === 'state') {
+      var vs = validStates(sel.food);
+      var opts = vs.map(function (s) { return { v: s, l: stateLabel(s) }; });
+      botSay(esc(sel.food.name) + ' - got it. What state is it in?', selWidget(opts, sel.state, 'state'));
+      var last = logEl.lastChild; bindSel(last);
     }
-    html += '<div class="gb-chips" id="gb-statechips">';
-    for (var i = 0; i < ids.length; i++) {
-      var s = DATA.states[ids[i]];
-      html += '<button type="button" class="gb-chip" data-state="' + esc(ids[i]) + '"' +
-        (sel.state === ids[i] ? ' aria-pressed="true"' : '') + '>' + esc(s.label) + '</button>';
-    }
-    html += '</div><div id="gb-statenote"></div>';
-    $('gb-q2').innerHTML = html;
-    var chips = $('gb-statechips').querySelectorAll('.gb-chip');
-    for (var c = 0; c < chips.length; c++) {
-      chips[c].addEventListener('click', function () {
-        sel.state = this.getAttribute('data-state');
-        renderStateStep(food); renderQtyStep(food, false); updateGuide();
+    if (key === 'amount') {
+      var u = sel.food.unit === 'piece' ? 'pieces' : sel.food.unit;
+      var widget = '<span class="gc-widgets">' +
+        '<input class="gc-num" id="gc-qty" type="number" inputmode="decimal" min="0.25" step="0.5" value="' + esc(sel.food.ref) + '" aria-label="Amount">' +
+        '<span class="gc-unitlbl">' + esc(u) + (sel.food.unit_note ? ' (' + esc(sel.food.unit_note) + ')' : '') + '</span>' +
+        '<button class="gc-set" id="gc-setqty">Set</button></span>';
+      botSay('How much are you making?', widget);
+      var w = logEl.lastChild;
+      w.querySelector('#gc-setqty').addEventListener('click', function () {
+        var v = w.querySelector('#gc-qty').value;
+        userSay(v + ' ' + u);
+        applyAnswer('amount', v);
+      });
+      w.querySelector('#gc-qty').addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') { w.querySelector('#gc-setqty').click(); }
       });
     }
-    renderStateNote(food);
-  }
-
-  function renderStateNote(food) {
-    var st = DATA.states[sel.state];
-    $('gb-statenote').innerHTML = st && st.note ? '<p class="gb-statenote">ℹ️ ' + esc(st.note) + '</p>' : '';
-  }
-
-  function renderQtyStep(food, resetQty) {
-    var anchors = food.anchors || [];
-    var html = '';
-    if (anchors.length > 1) {
-      var unitLabel = food.unit === 'piece' ? 'pieces' : (food.unit === 'oz' ? 'oz' : 'lb');
-      var qtyVal = (resetQty || sel.qty == null) ? food.ref : sel.qty;
-      sel.qty = qtyVal;
-      html += '<p class="gb-q"><span class="gb-n">3</span>How much?</p>' +
-        '<p class="gb-hint">Time scales with amount — the range below adjusts automatically.</p>' +
-        '<div class="gb-qtyrow">' +
-        '<input class="gb-qty" id="gb-qty" type="number" inputmode="decimal" min="' +
-        (food.unit === 'piece' ? 1 : 0.25) + '" max="40" step="' + (food.unit === 'piece' ? 1 : 0.5) +
-        '" value="' + esc(qtyVal) + '" aria-label="Amount in ' + esc(unitLabel) + '">' +
-        '<span class="gb-unit">' + esc(unitLabel) + '</span>' +
-        (food.unit_note ? '<span class="gb-note">' + esc(food.unit_note) + '</span>' : '') +
-        '</div><div class="gb-chips" style="margin-top:10px" id="gb-qtychips">';
-      for (var i = 0; i < anchors.length; i++) {
-        html += '<button type="button" class="gb-chip" data-qty="' + esc(anchors[i][0]) + '"' +
-          (Math.abs(anchors[i][0] - qtyVal) < 1e-9 ? ' aria-pressed="true"' : '') + '>' +
-          esc(anchors[i][0]) + ' ' + esc(unitLabel) + '</button>';
-      }
-      html += '</div>';
-    } else {
-      sel.qty = null;
-      html += '<p class="gb-hint">Amount: any quantity works at this setting.</p>';
-    }
-    $('gb-q3').innerHTML = html;
-    var inp = $('gb-qty');
-    if (inp) {
-      inp.addEventListener('input', function () {
-        var v = parseFloat(this.value);
-        sel.qty = isNaN(v) || v <= 0 ? null : v;
-        var chips = $('gb-qtychips');
-        if (chips) {
-          var cs = chips.querySelectorAll('.gb-chip');
-          for (var i = 0; i < cs.length; i++) cs[i].removeAttribute('aria-pressed');
-        }
-        updateGuide();
+    if (key === 'fryer') {
+      var widget2 = '<span class="gc-widgets">' +
+        selWidget([{ v: 'basket', l: 'Basket (drawer)' }, { v: 'oven', l: 'Oven-style' }], sel.style, 'style') +
+        selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt') +
+        '</span>';
+      botSay('Which air fryer do you have?', widget2);
+      var w2 = logEl.lastChild;
+      var sels = w2.querySelectorAll('select.gc-sel');
+      bindSel({ querySelector: function () { return sels[0]; } });
+      sels[0].addEventListener('change', function () {
+        userSay(sels[0].options[sels[0].selectedIndex].text);
+        sel.style = sels[0].value;
+        proceed();
+      });
+      sels[1].addEventListener('change', function () {
+        sel.watt = sels[1].value;
+        userSay(sels[1].options[sels[1].selectedIndex].text);
+        proceed();
       });
     }
-    var chipBox = $('gb-qtychips');
-    if (chipBox) {
-      var ch = chipBox.querySelectorAll('.gb-chip');
-      for (var k = 0; k < ch.length; k++) {
-        ch[k].addEventListener('click', function () {
-          var all = chipBox.querySelectorAll('.gb-chip');
-          for (var j = 0; j < all.length; j++) all[j].removeAttribute('aria-pressed');
-          this.setAttribute('aria-pressed', 'true');
-          sel.qty = parseFloat(this.getAttribute('data-qty'));
-          var field = $('gb-qty');
-          if (field) field.value = sel.qty;
-          updateGuide();
-        });
-      }
+    if (key === 'goal') {
+      var opts3 = ['none', 'crispy', 'quick', 'juicy'].map(function (k3) {
+        return { v: k3, l: DATA.goals[k3].label };
+      });
+      botSay('Last one - the goal?', selWidget(opts3, sel.goal, 'goal'));
+      var last3 = logEl.lastChild; bindSel(last3);
     }
   }
 
-  function bindOptions() {
-    $('gb-style').addEventListener('change', function () { sel.style = this.value; updateGuide(); });
-    $('gb-watt').addEventListener('change', function () { sel.watt = this.value; updateGuide(); });
-    $('gb-preheat').addEventListener('change', function () { sel.preheat = this.checked; updateGuide(); });
-    $('gb-breaded').addEventListener('change', function () { sel.breaded = this.checked; updateGuide(); });
+  function nextMissing() {
+    if (!sel.food) return 'food';
+    var vs = validStates(sel.food);
+    if (vs.length > 1 && !sel.state) return 'state';
+    if (sel.food.anchors.length > 1 && sel.qty == null) return 'amount';
+    if (!sel.style) return 'fryer';
+    if (!sel.goal) return 'goal';
+    return null;
+  }
+  function proceed() {
+    var miss = nextMissing();
+    if (!miss) { answerNow(); return; }
+    ask(miss);
   }
 
-  function updateGuide() {
-    if (!sel.food) { $('gb-q4').hidden = true; $('gb-out').innerHTML = ''; return; }
-    $('gb-q4').hidden = false;
-    var food = DATA.foodsById[sel.food];
-    if (!sel.state) sel.state = food.base_state;
-    var g = compute(food, sel.state, sel.qty, sel);
-    $('gb-out').innerHTML = renderGuide(food, g);
-    bindGuideActions(food, g);
-    syncUrl();
-  }
+  /* ═══ الجواب: درجات الحرارة + جملة أو جملتين ═══ */
 
-  function guideText(food, g) {
+  function qtyLabel() {
+    if (sel.qty == null) return '';
+    return fmtT(sel.qty) + ' ' + (sel.unit === 'piece' ? (sel.qty === 1 ? 'piece' : 'pieces') : sel.unit);
+  }
+  function sayIt(food, g) {
+    var shakeWord = (food.cat === 'vegetables' || food.cat === 'potatoes' || food.cat === 'frozen') ? ', shake halfway' : ', flip at the midpoint';
+    var s1 = '<b>' + esc(food.name) + '</b>' + (sel.qty != null ? ' (' + esc(qtyLabel()) + ')' : '') +
+      ' - ' + esc(g.st.label.toLowerCase()) + ': <b>' + g.temp + '°F / ' + toC(g.temp) + '°C for ' +
+      fmtT(g.tmin) + '-' + fmtT(g.tmax) + ' min</b> in a ' + (sel.style === 'oven' ? 'oven-style' : 'basket') +
+      (sel.preheat === false ? ' cold' : ' preheated') + ' fryer, single layer' + shakeWord + '.';
+    var s2 = g.internal
+      ? 'Pull at <b>' + g.internal + '°F / ' + toC(g.internal) + '°C</b> inside - a thermometer decides, not the clock' +
+        (g.rest ? ', then rest ' + fmtT(g.rest) + ' min.' : '.')
+      : 'Done when ' + esc(food.check) + '.';
+    return '<p class="gc-say">' + s1 + '</p><p class="gc-say">' + s2 + '</p>' +
+      (g.goalNote ? '<p class="gc-goalnote">' + esc(g.goalNote) + '</p>' : '');
+  }
+  function copyText(food, g) {
     var steps = buildSteps(food, g, sel);
-    var lines = [];
-    lines.push('AIR FRYER GUIDE — ' + food.name.toUpperCase());
-    lines.push('State: ' + (g.st.label || 'Fresh'));
-    lines.push('Temperature: ' + g.temp + '°F / ' + toC(g.temp) + '°C');
-    lines.push('Time: ' + fmtT(g.tmin) + '–' + fmtT(g.tmax) + ' minutes (single layer)');
-    if (g.internal) lines.push('Safe internal: ' + g.internal + '°F / ' + toC(g.internal) + '°C — verify with a thermometer');
-    if (g.rest) lines.push('Rest: ' + fmtT(g.rest) + ' min');
-    lines.push('');
-    for (var i = 0; i < steps.length; i++) lines.push((i + 1) + '. ' + steps[i]);
-    if (food.check) lines.push('');
-    if (food.check) lines.push('Done when: ' + food.check + '.');
-    lines.push('Data v' + DATA.version + ' — ' + DATA.disclaimer);
-    lines.push('From Crisp Charts: https://crispcharts.me/tools/air-fryer-guide-generator.html');
-    return lines.join('\n');
+    var L = [];
+    L.push('AIR FRYER - ' + food.name.toUpperCase() + (sel.qty != null ? ' (' + qtyLabel() + ')' : ''));
+    L.push(g.st.label + ': ' + g.temp + '°F / ' + toC(g.temp) + '°C for ' + fmtT(g.tmin) + '-' + fmtT(g.tmax) + ' min, single layer.');
+    if (g.internal) L.push('Safe internal: ' + g.internal + '°F / ' + toC(g.internal) + '°C - verify with a thermometer.' + (g.rest ? ' Rest ' + fmtT(g.rest) + ' min.' : ''));
+    else L.push('Done when: ' + food.check + '.');
+    L.push('');
+    steps.forEach(function (s, i) { L.push((i + 1) + '. ' + s); });
+    L.push('');
+    L.push('Data v' + DATA.version + ' - ' + DATA.disclaimer);
+    L.push('crispcharts.me/tools/air-fryer-guide-generator.html');
+    return L.join('\n');
   }
-
   function toast(msg) {
     var t = $('gb-toast');
+    if (!t) return;
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(function () { t.classList.remove('show'); }, 1900);
-  }
-
-  function bindGuideActions(food, g) {
-    var cg = $('[data-gb-copy-guide]');
-    if (cg) cg.addEventListener('click', function () {
-      copyText(guideText(food, g)); toast('Guide copied — paste it anywhere');
-    });
-    var cl = $('[data-gb-copy-link]');
-    if (cl) cl.addEventListener('click', function () {
-      copyText(location.href); toast('Link copied');
-    });
-    var pr = $('[data-gb-print]');
-    if (pr) pr.addEventListener('click', function () { window.print(); });
-    var pn = $('[data-gb-pin]');
-    if (pn) pn.addEventListener('click', function () {
-      var img = location.origin + '/og-default.png';
-      var u = 'https://pinterest.com/pin/create/button/?url=' + encodeURIComponent(location.href) +
-        '&media=' + encodeURIComponent(img) +
-        '&description=' + encodeURIComponent(food.name + ' air fryer guide: ' + g.temp + '°F · ' + fmtT(g.tmin) + '-' + fmtT(g.tmax) + ' min');
-      window.open(u, '_blank', 'noopener');
-    });
-  }
-
-  function copyText(txt) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt).catch(function () { legacyCopy(txt); });
-    } else { legacyCopy(txt); }
+    setTimeout(function () { t.classList.remove('show'); }, 1800);
   }
   function legacyCopy(txt) {
     var ta = document.createElement('textarea');
@@ -868,110 +997,338 @@ function ccToggleTheme() {
     document.body.removeChild(ta);
   }
 
-  /* ───────── رابط المشاركة ───────── */
-
-  function syncUrl() {
-    if (!history.replaceState) return;
-    var p = new URLSearchParams();
-    p.set('food', sel.food);
-    if (sel.state && sel.state !== 'fresh') p.set('state', sel.state);
-    if (sel.qty != null) p.set('qty', sel.qty);
-    if (sel.style !== 'basket') p.set('style', sel.style);
-    if (sel.watt !== 'std') p.set('watt', sel.watt);
-    if (!sel.preheat) p.set('preheat', '0');
-    if (sel.breaded) p.set('breaded', '1');
-    history.replaceState(null, '', location.pathname + '?' + p.toString());
-  }
-
-  function applyUrl() {
-    if (!location.search) return;
-    var p = new URLSearchParams(location.search);
-    var fid = p.get('food');
-    if (fid && DATA.foodsById[fid]) {
-      sel.food = fid;
-      var st = p.get('state');
-      var food = DATA.foodsById[fid];
-      var ids = validStates(food);
-      if (st && ids.indexOf(st) !== -1) sel.state = st;
-      if (p.get('qty')) sel.qty = parseFloat(p.get('qty'));
-      if (p.get('style') === 'oven') sel.style = 'oven';
-      if (p.get('watt')) sel.watt = p.get('watt');
-      if (p.get('preheat') === '0') sel.preheat = false;
-      if (p.get('breaded') === '1') sel.breaded = true;
-      renderCatalog();
-      renderStateStep(food);
-      renderQtyStep(food, false);
-      if ($('gb-style')) {
-        $('gb-style').value = sel.style; $('gb-watt').value = sel.watt;
-        $('gb-preheat').checked = sel.preheat; $('gb-breaded').checked = sel.breaded;
-      }
-      updateGuide();
-      setTimeout(function () { $('gb-out').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+  function answerNow() {
+    var food = sel.food;
+    var notes = [];
+    /* استقلالية كاملة: تبديلات داخلية حتمية فقط */
+    var REHEAT_SWAP = { 'french-fries': 'fries-leftover', 'steak': 'steak-leftover', 'pizza-frozen': 'pizza-slice', 'spring-rolls': 'spring-rolls-leftover' };
+    if (sel.state === 'reheat' && REHEAT_SWAP[food.id] && DATA.foodsById[REHEAT_SWAP[food.id]]) {
+      food = DATA.foodsById[REHEAT_SWAP[food.id]];
     }
+    var vs = validStates(food);
+    if (!sel.state || vs.indexOf(sel.state) === -1) {
+      if (sel.state && sel.state !== food.base_state) notes.push('That state does not apply to this one - using: ' + stateLabel(food.base_state).toLowerCase() + '.');
+      sel.state = food.base_state;
+    }
+    if (food.base_state === 'frozen' && sel.state === 'fresh') {
+      notes.push('These are made for the freezer - from fresh, check 2-3 minutes early.');
+    }
+    if (sel.qty != null && sel.unit && sel.unit !== food.unit && food.unit !== 'piece') {
+      notes.push('Amount noted (' + qtyLabel() + ') - the range below assumes a standard single layer; add a minute or two for more.');
+    }
+    var g = compute(food, sel.state, sel.qty, sel);
+    pending = null; cand = null;
+
+    var d = document.createElement('div');
+    d.className = 'gc-msg gc-answer';
+    var h = '<div class="statcards" role="list" aria-label="Settings">' +
+      '<div class="statcard" role="listitem"><span class="num">' + g.temp + '°F / ' + toC(g.temp) + '°C</span><span class="lbl">Set temp</span></div>' +
+      '<div class="statcard" role="listitem"><span class="num">' + fmtT(g.tmin) + '-' + fmtT(g.tmax) + ' min</span><span class="lbl">Cook time</span></div>' +
+      (g.internal ? '<div class="statcard safe" role="listitem"><span class="num">' + g.internal + '°F / ' + toC(g.internal) + '°C</span><span class="lbl">Safe internal</span></div>' : '') +
+      (g.rest ? '<div class="statcard hot" role="listitem"><span class="num">' + fmtT(g.rest) + ' min</span><span class="lbl">Rest</span></div>' : '') +
+      '</div>';
+    h += sayIt(food, g);
+    notes.forEach(function (n) { h += '<p class="gc-goalnote">' + esc(n) + '</p>'; });
+    h += '<div class="gc-actions">' +
+      '<button type="button" class="gc-act" data-gb-copy>📋 Copy guide</button>' +
+      '<button type="button" class="gc-act" data-gb-link>🔗 Copy link</button>' +
+      '<button type="button" class="gc-act" data-gb-print>🖨 Print</button>' +
+      '<button type="button" class="gc-act" data-gb-reset>↺ New food</button>' +
+      '</div>';
+    h += '<details class="gc-details"><summary>Full method, tips and why these numbers</summary>' +
+      '<ol class="gb-steps">';
+    buildSteps(food, g, sel).forEach(function (s) { h += '<li>' + esc(s) + '</li>'; });
+    h += '</ol>';
+    if (g.adj.length) {
+      h += '<div class="gb-adj"><b>Why these numbers:</b><ul>';
+      g.adj.forEach(function (a) { h += '<li>' + esc(a) + '</li>'; });
+      h += '</ul></div>';
+    }
+    if (food.tips && food.tips.length) {
+      h += '<ul class="gb-tips">';
+      food.tips.forEach(function (tp) { h += '<li>' + esc(tp) + '</li>'; });
+      h += '</ul>';
+    }
+    h += '<p class="gb-ver">Data v' + esc(DATA.version) + ' - calculated from USDA safe-temperature tables and tested charts, in your browser. ' + esc(DATA.disclaimer) + '</p>';
+    h += '</details>';
+    d.innerHTML = h;
+    logEl.appendChild(d);
+    scrollLog();
+
+    d.querySelector('[data-gb-copy]').addEventListener('click', function () {
+      var txt = copyText(food, g);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).catch(function () { legacyCopy(txt); });
+      else legacyCopy(txt);
+      toast('Guide copied');
+    });
+    d.querySelector('[data-gb-link]').addEventListener('click', function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).catch(function () { legacyCopy(location.href); });
+      else legacyCopy(location.href);
+      toast('Link copied');
+    });
+    d.querySelector('[data-gb-print]').addEventListener('click', function () { window.print(); });
+    d.querySelector('[data-gb-reset]').addEventListener('click', function () { resetChat(); });
+    syncUrl(food);
+    inEl.value = '';
+    inEl.placeholder = 'Anything to change? Or type another food…';
   }
 
-  /* ───────── الإقلاع ───────── */
+  function resetChat() {
+    sel = { food: null, state: null, qty: null, unit: null, style: null, watt: null, goal: null, preheat: true, breaded: false };
+    pending = null; cand = null;
+    botSay('Fresh start - what are you cooking?');
+    inEl.placeholder = 'Type what you\u2019re cooking: wings, fries, salmon\u2026';
+    inEl.focus();
+  }
+
+  /* ═══ اقتراحات أثناء الكتابة ═══ */
+
+  function renderAuto() {
+    var auto = $('gc-auto');
+    if (!auto) return;
+    var q = norm(inEl.value);
+    if (!q || q.length < 2 || (pending !== 'food' && !sel.food && !cand)) { auto.hidden = true; autoIdx = -1; return; }
+    var hits = [];
+    INDEX.forEach(function (e) {
+      e.texts.forEach(function (x) {
+        if (x.t.indexOf(q) === 0) hits.push({ f: e.f, s: 100 - x.t.length * 0.1 });
+        else if (x.t.indexOf(q) !== -1) hits.push({ f: e.f, s: 70 });
+      });
+    });
+    hits.sort(function (a, b) { return b.s - a.s; });
+    var uniq = [], seen = {};
+    hits.forEach(function (h) { if (!seen[h.f.id] && uniq.length < 6) { seen[h.f.id] = 1; uniq.push(h); } });
+    if (!uniq.length) { auto.hidden = true; autoIdx = -1; return; }
+    autoItems = uniq; autoIdx = -1;
+    var h2 = '';
+    uniq.forEach(function (u, i) {
+      h2 += '<button type="button" class="gc-opt" data-i="' + i + '">' + esc(u.f.name) +
+        '<span class="gc-cat">' + esc(u.f.cat_icon + ' ' + u.f.cat_label) + '</span></button>';
+    });
+    auto.innerHTML = h2;
+    auto.hidden = false;
+    Array.prototype.forEach.call(auto.querySelectorAll('.gc-opt'), function (b) {
+      b.addEventListener('mousedown', function (ev) {
+        ev.preventDefault();
+        pickAuto(parseInt(b.getAttribute('data-i'), 10));
+      });
+    });
+  }
+  function pickAuto(i) {
+    var u = autoItems[i];
+    var auto = $('gc-auto');
+    if (auto) auto.hidden = true;
+    if (!u) return;
+    inEl.value = u.f.name;
+    handleTurn(u.f.name);
+  }
+
+  /* ═══ معالجة كل رسالة ═══ */
+
+  function handleTurn(text) {
+    userSay(text);
+    var nt = norm(text);
+    if (RX.reset.test(nt)) { resetChat(); return; }
+    var p = parseUtterance(text);
+
+    if (p.skip && pending) {
+      if (pending === 'state') sel.state = sel.food.base_state;
+      else if (pending === 'amount') sel.qty = null;
+      else if (pending === 'fryer') { sel.style = sel.style || 'basket'; sel.watt = sel.watt || 'std'; }
+      else if (pending === 'goal') sel.goal = 'none';
+      pending = null;
+      proceed();
+      return;
+    }
+
+    /* مرشحات متبقية: جرب النص الخام ثم الحالة الحالية */
+    if (!p.food && p.candidates) {
+      var stHint = p.state || sel.state;
+      var auto = stHint ? p.candidates.filter(function (f) { return f.base_state === stHint; }) : [];
+      if (auto.length === 1) p.food = auto[0];
+    }
+    if (!p.food && cand) {
+      var fm2 = matchFoodRaw(text);
+      if (fm2.type === 'exact' && cand.some(function (f) { return f.id === fm2.food.id; })) p.food = fm2.food;
+      else if (fm2.type === 'exact') p.food = fm2.food;
+    }
+
+    if (p.reset) { resetChat(); return; }
+
+    if (p.food && (!sel.food || p.food.id !== sel.food.id)) {
+      sel.food = p.food.id; sel.state = null; sel.qty = null; sel.unit = null;
+      sel.goal = null; sel.style = null; sel.watt = null;
+      cand = null; pending = null;
+      botSay('Got it: <b>' + esc(p.food.name) + '</b>.');
+    } else if (!p.food && p.candidates) {
+      cand = p.candidates; pending = 'food';
+      var names = p.candidates.map(function (f) { return f.name; }).join(', ');
+      botSay('Which one? ' + esc(names) + ' - type it or pick:',
+        '<span class="gc-widgets">' +
+        p.candidates.map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.name) + '</option>'; })
+          .join('').replace(/^/, '<select class="gc-sel" data-key="cand"><option value="">Pick one…</option>').replace(/$/, '</select>') +
+        '</span>');
+      var selEl = logEl.lastChild.querySelector('select.gc-sel');
+      selEl.addEventListener('change', function () {
+        if (!selEl.value) return;
+        userSay(selEl.options[selEl.selectedIndex].text);
+        var f2 = DATA.foodsById[selEl.value];
+        sel.food = f2.id; sel.state = null; sel.qty = null; sel.goal = null; sel.style = null; sel.watt = null;
+        cand = null; pending = null;
+        botSay('Got it: <b>' + esc(f2.name) + '</b>.');
+        proceed();
+      });
+      return;
+    }
+
+    if (pending === 'amount' && p.qty == null && !p.food) {
+      var b = nt.match(RX.bare);
+      if (b) {
+        var n = parseFloat(b[1]);
+        if (sel.food.unit === 'piece') { p.qty = n; p.unit = 'piece'; }
+        else { p.qty = n; p.unit = n <= 5 ? 'lb' : 'oz'; }
+      }
+    }
+    if (pending === 'state' && !p.state) {
+      var s3 = stateFromText(nt);
+      if (s3) p.state = s3;
+    }
+    if (pending === 'fryer' && !p.style && !p.watt && !p.food) {
+      var f4 = fryerFromText(nt);
+      if (f4.style) p.style = f4.style;
+      if (f4.watt) p.watt = f4.watt;
+      if (!p.style && !p.watt) { p.style = 'basket'; }
+    }
+    if (pending === 'goal' && !p.goal && !p.food) {
+      p.goal = goalFromText(nt) || 'none';
+    }
+
+    if (p.state) sel.state = p.state;
+    if (p.qty != null) {
+      var foodObj = sel.food ? DATA.foodsById[sel.food] : null;
+      var pu = p.unit || (foodObj ? foodObj.unit : null);
+      if (foodObj && pu && pu !== foodObj.unit && foodObj.unit === 'piece') {
+        /* كمية بالوزن لصنف يُقاس بالقطع — نلاحظها ونكمل بالكمية المرجعية */
+        sel.qty = null; sel.unit = null;
+        botSay('Noted the amount - this one is measured in pieces, so the guide uses a standard single layer.');
+      } else {
+        sel.qty = p.qty; sel.unit = pu;
+      }
+      pending = null;
+    }
+    if (p.style) { sel.style = p.style; pending = null; }
+    if (p.watt) sel.watt = p.watt;
+    if (p.goal) { sel.goal = p.goal; pending = null; }
+    if (p.preheat != null) sel.preheat = p.preheat;
+
+    proceed();
+  }
+
+  /* ═══ رابط المشاركة + الإقلاع ═══ */
+
+  function syncUrl(food) {
+    if (!history.replaceState) return;
+    var p2 = new URLSearchParams();
+    p2.set('food', food.id);
+    if (sel.state) p2.set('state', sel.state);
+    if (sel.qty != null) p2.set('qty', sel.qty);
+    if (sel.style) p2.set('style', sel.style);
+    if (sel.watt) p2.set('watt', sel.watt);
+    if (sel.goal && sel.goal !== 'none') p2.set('goal', sel.goal);
+    if (sel.preheat === false) p2.set('preheat', '0');
+    history.replaceState(null, '', location.pathname + '?' + p2.toString());
+  }
+  function applyUrl() {
+    if (!location.search) return false;
+    var p3 = new URLSearchParams(location.search);
+    var fid = p3.get('food');
+    if (!fid || !DATA.foodsById[fid]) return false;
+    var f = DATA.foodsById[fid];
+    sel.food = f.id;
+    var st = p3.get('state');
+    var vs = validStates(f);
+    sel.state = (st && vs.indexOf(st) !== -1) ? st : f.base_state;
+    if (p3.get('qty')) sel.qty = parseFloat(p3.get('qty'));
+    if (p3.get('style')) sel.style = p3.get('style');
+    if (p3.get('watt')) sel.watt = p3.get('watt');
+    sel.goal = p3.get('goal') || 'none';
+    if (p3.get('preheat') === '0') sel.preheat = false;
+    userSay(f.name + (sel.state ? ' - ' + stateLabel(sel.state).toLowerCase() : ''));
+    answerNow();
+    return true;
+  }
 
   function boot(data) {
     DATA = data;
     DATA.foodsById = {};
     for (var i = 0; i < DATA.foods.length; i++) DATA.foodsById[DATA.foods[i].id] = DATA.foods[i];
+    buildIndex();
     var host = $('gb');
     host.innerHTML =
-      '<div class="gb-wiz">' +
-      '<div class="gb-step" id="gb-q1">' +
-      '<p class="gb-q"><span class="gb-n">1</span>What are you cooking?</p>' +
-      '<div class="gb-search"><input id="gb-search" type="search" placeholder="Search ' + DATA.foods.length + ' foods: wings, salmon, fries, tots…" aria-label="Search foods"></div>' +
-      '<div class="gb-cats" id="gb-cats"></div>' +
-      '<div class="gb-foods" id="gb-foods"></div>' +
+      '<div class="gc" id="gc">' +
+      '<div class="gc-log" id="gc-log" aria-live="polite"></div>' +
+      '<div class="gc-inputrow">' +
+      '<input class="gc-in" id="gc-in" type="text" autocomplete="off" placeholder="Type what you\u2019re cooking: wings, fries, salmon\u2026" aria-label="Type your food or answer">' +
+      '<button class="gc-send" id="gc-send" type="button">Send</button>' +
       '</div>' +
-      '<div class="gb-step" id="gb-q2" hidden></div>' +
-      '<div class="gb-step" id="gb-q3" hidden></div>' +
-      '<div class="gb-step" id="gb-q4" hidden>' +
-      '<details class="gb-opts"><summary>Your air fryer (optional — sharpens the numbers)</summary>' +
-      '<div class="gb-optgrid">' +
-      '<div class="gb-opt"><label for="gb-style">Type</label><select id="gb-style">' +
-      '<option value="basket">Basket (drawer style)</option><option value="oven">Oven-style (large door)</option></select></div>' +
-      '<div class="gb-opt"><label for="gb-watt">Power</label><select id="gb-watt">' +
-      '<option value="std">Standard (1000–1700 W)</option><option value="low">Compact (under 1000 W)</option><option value="high">High-power (1700 W+)</option></select></div>' +
-      '<div class="gb-opt"><span class="gb-switch"><input type="checkbox" id="gb-preheat" checked><label for="gb-preheat">I preheat 3 minutes first</label></span></div>' +
-      '<div class="gb-opt"><span class="gb-switch"><input type="checkbox" id="gb-breaded"><label for="gb-breaded">It is breaded / crumbed</label></span></div>' +
-      '</div></details></div>' +
-      '</div>' +
-      '<div id="gb-out" aria-live="polite"></div>';
-    renderCats();
-    renderCatalog();
-    bindOptions();
-    var search = $('gb-search');
-    search.addEventListener('input', function () {
-      shown = 24; renderCatalog();
+      '<div class="gc-auto" id="gc-auto" hidden></div>' +
+      '<p class="gc-hint">Type it your way - or say it all at once: <b>\u201Ccrispy frozen wings, 1 lb, oven style\u201D</b> - and you get the temperatures instantly. Nothing leaves your browser.</p>' +
+      '</div>';
+    logEl = $('gc-log'); inEl = $('gc-in');
+    botSay('What are you cooking? Start typing - suggestions appear as you type. Or say it all at once and I will answer straight away.');
+    $('gc-send').addEventListener('click', function () {
+      var v = inEl.value.trim();
+      if (v) handleTurn(v);
     });
-    applyUrl();
-    updateGuide();
+    inEl.addEventListener('keydown', function (ev) {
+      var auto = $('gc-auto');
+      if (ev.key === 'Enter') {
+        if (auto && !auto.hidden && autoIdx >= 0) { pickAuto(autoIdx); return; }
+        var v = inEl.value.trim();
+        if (v) { handleTurn(v); inEl.value = ''; }
+        $('gc-auto').hidden = true;
+      } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        if (!auto || auto.hidden) return;
+        ev.preventDefault();
+        autoIdx = ev.key === 'ArrowDown' ? Math.min(autoIdx + 1, autoItems.length - 1) : Math.max(autoIdx - 1, 0);
+        Array.prototype.forEach.call(auto.querySelectorAll('.gc-opt'), function (b, i) {
+          b.classList.toggle('hl', i === autoIdx);
+        });
+      } else if (ev.key === 'Escape') {
+        if (auto) auto.hidden = true;
+      }
+    });
+    inEl.addEventListener('input', renderAuto);
+    if (!applyUrl()) inEl.focus();
   }
 
-  fetch('/data/foods-v1.json', { credentials: 'same-origin' })
-    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(boot)
-    .catch(function () {
-      var host = $('gb');
-      if (host) host.innerHTML = '<div class="gb-noscript">The guide generator could not load its data file. ' +
-        'Browse the full charts instead: <a href="/">All charts</a> · ' +
-        '<a href="/posts/air-fryer-cooking-times-chart.html">Cooking times chart</a>.</div>';
-    });
+  if (typeof document !== 'undefined') {
+    fetch('/data/foods-v1.json', { credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(boot)
+      .catch(function () {
+        var host = $('gb');
+        if (host) host.innerHTML = '<div class="gb-noscript">The guide chat could not load its data file. ' +
+          'The numbers are still yours: browse the <a href="/">printable charts</a>.</div>';
+      });
+  }
 
   /* خطاف اختبار (node فقط — لا أثر في المتصفح) */
   if (typeof module !== 'undefined' && module.exports) {
+    var setData = function (data) {
+      DATA = data;
+      DATA.foodsById = {};
+      for (var i = 0; i < DATA.foods.length; i++) DATA.foodsById[DATA.foods[i].id] = DATA.foods[i];
+      buildIndex();
+    };
     module.exports = {
       interp: interp,
-      compute: function (data, food, stateId, qty, o) {
-        DATA = data;
-        return compute(food, stateId, qty, o);
-      },
-      buildSteps: function (data, food, g, o) {
-        DATA = data;
-        return buildSteps(food, g, o);
-      }
+      compute: function (data, food, stateId, qty, o) { setData(data); return compute(food, stateId, qty, o); },
+      buildSteps: function (data, food, g, o) { setData(data); return buildSteps(food, g, o); },
+      matchFood: function (data, text) { setData(data); return matchFoodRaw(text); },
+      parseUtterance: function (data, text) { setData(data); return parseUtterance(text); },
+      _setSel: function (s) { sel = s; },
+      _getSel: function () { return sel; }
     };
   }
 })();
