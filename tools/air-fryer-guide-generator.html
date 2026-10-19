@@ -643,7 +643,7 @@ function ccToggleTheme() {
     'grilled-cheese': ['grilled cheese', 'grilled cheese sandwich', 'cheese toastie', 'toastie'],
     'quesadilla': ['quesadilla', 'quesadillas'],
     'falafel-frozen': ['falafel', 'falafels'],
-    'chicken-breast': ['chicken breast', 'chicken breasts', 'boneless chicken breast', 'chicken boob'],
+    'chicken-breast': ['chicken breast', 'chicken breasts', 'boneless chicken breast', 'chicken breast fillets', 'chicken breast filets', 'chicken boob'],
     'chicken-thighs-boneless': ['boneless thighs', 'boneless chicken thighs', 'chicken thigh fillets'],
     'chicken-thighs-bone-in': ['bone in thighs', 'bone in chicken thighs', 'thighs bone in'],
     'chicken-drumsticks': ['drumsticks', 'drumstick', 'chicken legs', 'chicken leg'],
@@ -696,8 +696,9 @@ function ccToggleTheme() {
     });
   }
 
+  function stem(w) { return w.length > 3 && w.charAt(w.length - 1) === 's' ? w.slice(0, -1) : w; }
   function tokenCover(q, t) {
-    var qt = q.split(' '), tt = t.split(' ');
+    var qt = q.split(' ').map(stem), tt = t.split(' ').map(stem);
     var hit = 0;
     qt.forEach(function (tok) {
       var ok = tt.some(function (x) {
@@ -714,11 +715,14 @@ function ccToggleTheme() {
     if (!q) return { type: 'none' };
     if (DATA.foodsById[q]) return { type: 'exact', food: DATA.foodsById[q] };
     var hits = [];
+    var qToks = q.split(' ').map(stem);
+    var qs = qToks.join(' ');
     INDEX.forEach(function (e) {
       var best = 0;
       e.texts.forEach(function (x) {
         var s = 0;
-        if (x.t === q) s = x.w;
+        var xs = x.t.split(' ').map(stem).join(' ');
+        if (x.t === q || xs === qs) s = x.w;
         else if (q.indexOf(x.t) === 0 || x.t.indexOf(q) === 0) s = 80 + Math.min(x.t.length, q.length) * 0.4;
         else if (x.t.indexOf(q) !== -1) s = 74;
         else if (q.indexOf(x.t) !== -1) s = 72;
@@ -727,25 +731,47 @@ function ccToggleTheme() {
           if (c.full) s = 86;
           else if (c.partial) s = 58;
         }
+        if (s > 0) {
+          /* مكافأة الكلمة الحرفية: الطعام الذي يحتوي كلمات السؤال نفسها يتقدم على المشابه إملائياً */
+          var xToks = x.t.split(' ').map(stem);
+          var bonus = 0;
+          qToks.forEach(function (qt) {
+            if (xToks.indexOf(qt) !== -1) bonus = 8;
+            else if (bonus < 3 && xToks.some(function (xt) { return qt.length > 2 && xt.length > 2 && (xt.indexOf(qt) === 0 || qt.indexOf(xt) === 0); })) bonus = 3;
+          });
+          s += bonus;
+        }
         if (s > best) best = s;
       });
       if (best > 0) hits.push({ f: e.f, s: best });
     });
     if (!hits.length) return { type: 'none' };
-    hits.sort(function (a, b) { return b.s - a.s; });
+    hits.sort(function (a, b) {
+      if (b.s !== a.s) return b.s - a.s;
+      return (a.f.base_state === 'reheat' ? 1 : 0) - (b.f.base_state === 'reheat' ? 1 : 0);
+    });
     var uniq = [], seen = {};
     hits.forEach(function (h) { if (!seen[h.f.id]) { seen[h.f.id] = 1; uniq.push(h); } });
     var top = uniq[0], second = uniq[1];
-    if (top.s >= 95 || (top.s >= 80 && (!second || top.s - second.s >= 12))) return { type: 'exact', food: top.f };
+    var reheatWin = second && top.f.base_state !== 'reheat' && second.f.base_state === 'reheat' && top.s >= 80;
+    if (top.s >= 95 || (uniq.length === 1 && top.s >= 55) ||
+        (top.s >= 80 && (!second || top.s - second.s >= 12)) || reheatWin) {
+      return { type: 'exact', food: top.f };
+    }
     if (top.s >= 55) return { type: 'candidates', foods: uniq.slice(0, 3).map(function (h) { return h.f; }) };
     return { type: 'none' };
   }
 
   /* ═══ فهم الجملة الكاملة — حتمي ═══ */
 
+  var WORDNUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
+  var PIECE_U = 'fillets?|filets?|pieces?|pcs?|slices?|breasts?|thighs?|wings?|drumsticks?|eggs?|burgers?|patties?|strips?|tenders?|nuggets?|meatballs?|sausages?|links?|ribs?|chops?|steaks?|cobs?|servings?|portions?|dogs?|apples?|bananas?|peaches?|scallops?|cookies?|rolls?';
   var RX = {
-    qty: /(\d+(?:\.\d+)?)\s*(?:-|to)?\s*(lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|pieces?|pcs?|pc|dozen)\b/,
+    qty: new RegExp('(\\d+(?:\\.\\d+)?)\\s*(?:-|to)?\\s*(lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|kilograms?|dozen)\\b'),
+    pieceN: new RegExp('(\\d+(?:\\.\\d+)?)\\s+(?:(?:fresh|frozen|raw|thawed|large|small|big|jumbo|whole)\\s+){0,2}(?:[a-z]+\\s+){0,2}?(' + PIECE_U + ')\\b'),
+    wordNum: new RegExp('\\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\\s+(?:(?:fresh|frozen|raw|thawed|large|small|big|jumbo|whole)\\s+){0,2}(?:[a-z]+\\s+){0,2}?(' + PIECE_U + ')\\b'),
     bare: /\b(\d{1,3}(?:\.\d+)?)\b/,
+    wordBare: /\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/,
     watt: /(\d{3,4})\s*w\b/,
     skip: /^(idk|i do not know|i dont know|dunno|skip|any|anything|whatever|na|n a|just cook|you decide|default|no)[\s!.?]*$/,
     reset: /^(reset|start over|restart|another one|new one|clear|again|new)[\s!.?]*$/
@@ -776,11 +802,22 @@ function ccToggleTheme() {
   }
   function unitConvert(n, u) {
     if (u === 'g') return { qty: r05(n / 28.35), unit: 'oz' };
-    if (u === 'kg' || u === 'kilo' || u === 'kilos') return { qty: r05(n * 2.2046), unit: 'lb' };
-    if (u === 'dozen') return { qty: 12, unit: 'piece' };
+    if (u === 'kg' || u === 'kilo' || u === 'kilos' || u === 'kilograms') return { qty: r05(n * 2.2046), unit: 'lb' };
+    if (u === 'dozen') return { qty: 12 * n, unit: 'piece' };
     if (/^(piece|pieces|pcs|pc)$/.test(u)) return { qty: n, unit: 'piece' };
     if (/^(oz|ounces?)$/.test(u)) return { qty: n, unit: 'oz' };
     return { qty: n, unit: 'lb' };
+  }
+  /* الكلمات الحشوية — تبقى أسماء الأطعمة ووحدات القطع سليمة لمطابقة الطعام */
+  function stripText(t) {
+    return (' ' + t + ' ')
+      .replace(/\b\d+(?:\.\d+)?\s*(?:-|to)?\s*(?:lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|kilograms?|dozen)\b/g, ' ')
+      .replace(/\b\d{3,4}\s*w\b/g, ' ')
+      .replace(/\b\d+(?:\.\d+)?\b/g, ' ')
+      .replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|couple|dozen|several|few)\b/g, ' ')
+      .replace(/\b(minutes?|mins?|min|seconds?|secs?|hours?|hrs?)\b/g, ' ')
+      .replace(/\b(i|i am|im|i ll|ive|me|my|mine|we|us|our|you|your|yours|they|them|their|it|its|it is|this|that|these|those|there|here|want|wants|would|like|liked|need|needs|have|has|had|am|is|are|was|were|be|been|being|do|does|did|done|doing|will|can|could|should|shall|may|might|must|make|makes|made|cook|cooks|cooked|cooking|prepare|prepared|prep|air fry|airfry|air fryer|airfryer|fryer|fry|frying|machine|appliance|model|basket|drawer|basket style|guide|setting|settings|temperature|temperatures|temp|time|times|how|what|which|when|where|who|why|the|a|an|of|for|to|in|on|at|by|with|without|from|into|and|or|but|so|if|then|than|as|also|too|just|only|about|around|some|any|more|less|most|least|each|every|all|both|together|once|twice|at once|same time|please|thanks|thank you|ok|okay|yes|yeah|nope|hi|hello|hey|small|little|big|large|medium|huge|tiny|compact|oven style|oven type|toaster oven|big oven|air fryer oven|frozen|frzn|freezer|leftover|leftovers|reheat|reheated|reheating|marinated|marinade|breaded|crumbed|battered|fresh|thawed|defrosted|raw|not frozen|day old|yesterday|yesterdays|warming up|in crumbs|crispy|crisp|crunchy|extra crispy|quick|fast|hurry|rush|asap|juicy|moist|tender|succulent|in a rush|preheat|preheated|preheating|no preheat|without preheat|cold start|did not preheat|do not preheat|xl|dual|powerful|high power|low|high|standard|er|um|uh|oh|well|let|lets|get|got|give|show|tell|say|said|know|think|really|very|quite|pretty|much|many|lot|single|layer)\b/g, ' ')
+      .replace(/\s+/g, ' ').trim();
   }
   function parseUtterance(text) {
     var out = {};
@@ -789,8 +826,17 @@ function ccToggleTheme() {
     if (RX.skip.test(t)) { out.skip = true; return out; }
     if (RX.reset.test(t)) { out.reset = true; return out; }
 
+    /* الكمية: وزن (1 lb / 500 g) ثم عدّ قطع (2 fillets / two chicken breasts) */
     var m = t.match(RX.qty);
     if (m) { var c = unitConvert(parseFloat(m[1]), m[2]); out.qty = c.qty; out.unit = c.unit; }
+    if (out.qty == null) {
+      var pn = t.match(RX.pieceN);
+      if (pn) { out.qty = parseFloat(pn[1]); out.unit = 'piece'; }
+    }
+    if (out.qty == null) {
+      var wn = t.match(RX.wordNum);
+      if (wn) { out.qty = WORDNUM[wn[1]]; out.unit = 'piece'; }
+    }
 
     var stt = stateFromText(t); if (stt) out.state = stt;
     var gl = goalFromText(t); if (gl) out.goal = gl;
@@ -800,14 +846,7 @@ function ccToggleTheme() {
     if (/\bno preheat\w*|without preheat\w*|cold start|did not preheat|do not preheat\b/.test(t)) out.preheat = false;
     else if (/\bpreheat\w*\b/.test(t)) out.preheat = true;
 
-    var stripped = t
-      .replace(/(\d+(?:\.\d+)?)\s*(?:-|to)?\s*(lbs?|pounds?|oz|ounces?|grams?|gram|g|kgs?|kilos?|pieces?|pcs?|pc|dozen)\b/g, ' ')
-      .replace(/\b(i|i am|im|want|would like|need|make|cook|cooking|air fry|airfry|fry|frying|please|hi|hello|hey|some|the|a|an|my|its|it is|of|for|in|on|and|with|how long|how to|do i|you|me|guide|settings?|temperature|temp|time)\b/g, ' ')
-      .replace(/\b(frozen|frzn|freezer|leftovers?|reheat\w*|marinat\w*|breaded|crumbed|battered|fresh|thawed|defrosted|raw|not frozen|day[- ]?old|yesterdays?|warming up|in crumbs)\b/g, ' ')
-      .replace(/\b(crisp\w*|crunch\w*|extra crispy|quick|fast|hurry|rush|asap|juicy|moist|tender|succulent|in a rush)\b/g, ' ')
-      .replace(/\b(oven[- ]?style|oven type|toaster oven|big oven|air fryer oven|basket|drawer|basket style|compact|small|mini|tiny|xl|dual|powerful|high[- ]?power|no preheat\w*|without preheat\w*|cold start|did not preheat|do not preheat|preheat\w*)\b/g, ' ')
-      .replace(/\b(\d{3,4})\s*w\b/g, ' ')
-      .replace(/\s+/g, ' ').trim();
+    var stripped = stripText(t);
     if (stripped && stripped.length >= 3) {
       var fm = matchFoodRaw(stripped);
       if (fm.type === 'exact') out.food = fm.food;
@@ -843,8 +882,10 @@ function ccToggleTheme() {
   }
 
   function validStates(food) {
-    var ids = [food.base_state];
-    for (var k in food.states) if (k !== food.base_state && DATA.states[k]) ids.push(k);
+    var base = food.base_state || 'fresh';
+    var ids = [base];
+    var sts = food.states || {};
+    for (var k in sts) if (k !== base && DATA.states[k]) ids.push(k);
     return ids;
   }
   function stateLabel(id) { return (DATA.states[id] || {}).label || id; }
@@ -880,8 +921,31 @@ function ccToggleTheme() {
     proceed();
   }
 
+  /* سؤال «أيُّها تقصد؟» — قائمة منسدلة + الكتابة مقبولة دائماً */
+  function askCand() {
+    var names = cand.map(function (f) { return f.name; }).join(', ');
+    botSay('Which one? ' + esc(names) + ' - type it or pick:',
+      '<span class="gc-widgets"><select class="gc-sel" data-key="cand"><option value="">Pick one…</option>' +
+      cand.map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.name) + '</option>'; }).join('') +
+      '</select></span>');
+    var selEl = logEl.lastChild.querySelector('select.gc-sel');
+    selEl.addEventListener('change', function () {
+      if (!selEl.value) return;
+      userSay(selEl.options[selEl.selectedIndex].text);
+      var f2 = DATA.foodsById[selEl.value];
+      sel.food = f2;           /* كائن كامل — ولا نمسح ما فُهم من الجملة سابقاً */
+      cand = null; pending = null;
+      botSay('Got it: <b>' + esc(f2.name) + '</b>.');
+      proceed();
+    });
+  }
+
   function ask(key) {
     pending = key;
+    if (key === 'food') {
+      if (cand && cand.length) { askCand(); }
+      else { botSay('What are you cooking? Type it - suggestions appear as you type.'); }
+    }
     if (key === 'state') {
       var vs = validStates(sel.food);
       var opts = vs.map(function (s) { return { v: s, l: stateLabel(s) }; });
@@ -913,7 +977,6 @@ function ccToggleTheme() {
       botSay('Which air fryer do you have?', widget2);
       var w2 = logEl.lastChild;
       var sels = w2.querySelectorAll('select.gc-sel');
-      bindSel({ querySelector: function () { return sels[0]; } });
       sels[0].addEventListener('change', function () {
         userSay(sels[0].options[sels[0].selectedIndex].text);
         sel.style = sels[0].value;
@@ -935,10 +998,11 @@ function ccToggleTheme() {
   }
 
   function nextMissing() {
-    if (!sel.food) return 'food';
-    var vs = validStates(sel.food);
+    var f = sel.food;
+    if (!f || !f.id) return 'food';
+    var vs = validStates(f);
     if (vs.length > 1 && !sel.state) return 'state';
-    if (sel.food.anchors.length > 1 && sel.qty == null) return 'amount';
+    if (f.anchors && f.anchors.length > 1 && sel.qty == null) return 'amount';
     if (!sel.style) return 'fryer';
     if (!sel.goal) return 'goal';
     return null;
@@ -1125,7 +1189,11 @@ function ccToggleTheme() {
 
   /* ═══ معالجة كل رسالة ═══ */
 
+  var lastUser = '', lastUserAt = 0;
   function handleTurn(text) {
+    var now = Date.now();
+    if (text === lastUser && now - lastUserAt < 600) return;   /* منع الإرسال المزدوج */
+    lastUser = text; lastUserAt = now;
     userSay(text);
     var nt = norm(text);
     if (RX.reset.test(nt)) { resetChat(); return; }
@@ -1156,33 +1224,27 @@ function ccToggleTheme() {
     if (p.reset) { resetChat(); return; }
 
     if (p.food && (!sel.food || p.food.id !== sel.food.id)) {
-      sel.food = p.food.id; sel.state = null; sel.qty = null; sel.unit = null;
+      sel.food = p.food; sel.state = null; sel.qty = null; sel.unit = null;
       sel.goal = null; sel.style = null; sel.watt = null;
       cand = null; pending = null;
       botSay('Got it: <b>' + esc(p.food.name) + '</b>.');
     } else if (!p.food && p.candidates) {
+      /* طبّق ما فُهم من الجملة أولاً حتى لا يضيع بعد اختيار المرشح */
+      if (p.state) sel.state = p.state;
+      if (p.qty != null) { sel.qty = p.qty; sel.unit = p.unit; }
+      if (p.style) sel.style = p.style;
+      if (p.watt) sel.watt = p.watt;
+      if (p.goal) sel.goal = p.goal;
+      if (p.preheat != null) sel.preheat = p.preheat;
       cand = p.candidates; pending = 'food';
-      var names = p.candidates.map(function (f) { return f.name; }).join(', ');
-      botSay('Which one? ' + esc(names) + ' - type it or pick:',
-        '<span class="gc-widgets">' +
-        p.candidates.map(function (f) { return '<option value="' + esc(f.id) + '">' + esc(f.name) + '</option>'; })
-          .join('').replace(/^/, '<select class="gc-sel" data-key="cand"><option value="">Pick one…</option>').replace(/$/, '</select>') +
-        '</span>');
-      var selEl = logEl.lastChild.querySelector('select.gc-sel');
-      selEl.addEventListener('change', function () {
-        if (!selEl.value) return;
-        userSay(selEl.options[selEl.selectedIndex].text);
-        var f2 = DATA.foodsById[selEl.value];
-        sel.food = f2.id; sel.state = null; sel.qty = null; sel.goal = null; sel.style = null; sel.watt = null;
-        cand = null; pending = null;
-        botSay('Got it: <b>' + esc(f2.name) + '</b>.');
-        proceed();
-      });
+      askCand();
       return;
     }
 
     if (pending === 'amount' && p.qty == null && !p.food) {
-      var b = nt.match(RX.bare);
+      var clean = nt.replace(/\b(minutes?|mins?|min|seconds?|secs?|hours?|hrs?)\b/g, ' ');
+      var b = clean.match(RX.bare);
+      if (!b) { var wb = clean.match(RX.wordBare); if (wb) b = [null, String(WORDNUM[wb[1]])]; }
       if (b) {
         var n = parseFloat(b[1]);
         if (sel.food.unit === 'piece') { p.qty = n; p.unit = 'piece'; }
@@ -1205,7 +1267,7 @@ function ccToggleTheme() {
 
     if (p.state) sel.state = p.state;
     if (p.qty != null) {
-      var foodObj = sel.food ? DATA.foodsById[sel.food] : null;
+      var foodObj = sel.food || null;
       var pu = p.unit || (foodObj ? foodObj.unit : null);
       if (foodObj && pu && pu !== foodObj.unit && foodObj.unit === 'piece') {
         /* كمية بالوزن لصنف يُقاس بالقطع — نلاحظها ونكمل بالكمية المرجعية */
@@ -1244,7 +1306,7 @@ function ccToggleTheme() {
     var fid = p3.get('food');
     if (!fid || !DATA.foodsById[fid]) return false;
     var f = DATA.foodsById[fid];
-    sel.food = f.id;
+    sel.food = f;
     var st = p3.get('state');
     var vs = validStates(f);
     sel.state = (st && vs.indexOf(st) !== -1) ? st : f.base_state;
@@ -1327,6 +1389,7 @@ function ccToggleTheme() {
       buildSteps: function (data, food, g, o) { setData(data); return buildSteps(food, g, o); },
       matchFood: function (data, text) { setData(data); return matchFoodRaw(text); },
       parseUtterance: function (data, text) { setData(data); return parseUtterance(text); },
+      _nextMissing: function (s) { if (s) sel = s; return nextMissing(); },
       _setSel: function (s) { sel = s; },
       _getSel: function () { return sel; }
     };
