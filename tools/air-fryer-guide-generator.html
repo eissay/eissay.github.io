@@ -173,6 +173,15 @@ function ccToggleTheme() {
 .gc-say { margin: 12px 0 0; font: 400 15px/1.75 var(--font-ui); color: var(--ink-soft); }
 .gc-say b { color: var(--ink); font-weight: 700; }
 .gc-goalnote { margin: 8px 0 0; font: 500 13px/1.6 var(--font-ui); color: var(--gold); }
+/* بطاقات الأرقام داخل الدردشة — أعمدة مرنة التفاف بدل القصّ (إصلاح الأرقام الناقصة) */
+.gc-answer .statcards { grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 8px; margin: 12px 0 0; }
+.gc-answer .statcard { padding: 10px 8px 9px; }
+.gc-answer .statcard .num {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: clamp(15px, 1.1vw + 11px, 19px);
+  line-height: 1.35;
+}
 .gc-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .gc-act {
   background: var(--bg-2);
@@ -891,7 +900,9 @@ function ccToggleTheme() {
   function stateLabel(id) { return (DATA.states[id] || {}).label || id; }
 
   function selWidget(opts, current, key) {
-    var h = '<span class="gc-widgets"><select class="gc-sel" data-key="' + key + '">';
+    /* خيار placeholder معطّل أولاً دائماً — حتى يعمل اختيار الخيار الأول (change لا ينطلق إن كان مختاراً مسبقاً) */
+    var h = '<span class="gc-widgets"><select class="gc-sel" data-key="' + key + '">' +
+      '<option value="" disabled' + (current ? '' : ' selected') + '>Pick one…</option>';
     opts.forEach(function (o) {
       h += '<option value="' + esc(o.v) + '"' + (current === o.v ? ' selected' : '') + '>' + esc(o.l) + '</option>';
     });
@@ -970,22 +981,24 @@ function ccToggleTheme() {
       });
     }
     if (key === 'fryer') {
-      var widget2 = '<span class="gc-widgets">' +
-        selWidget([{ v: 'basket', l: 'Basket (drawer)' }, { v: 'oven', l: 'Oven-style' }], sel.style, 'style') +
-        selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt') +
-        '</span>';
-      botSay('Which air fryer do you have?', widget2);
+      /* النوع مطلوب؛ القدرة تُعرض معه وتبقى اختيارية (افتراضياً قياسية) */
+      var parts = [];
+      if (!sel.style) {
+        parts.push(selWidget([{ v: 'basket', l: 'Basket (drawer)' }, { v: 'oven', l: 'Oven-style' }], sel.style, 'style'));
+        parts.push(selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt'));
+        botSay('Which air fryer do you have? Type and power - power is optional.', '<span class="gc-widgets">' + parts.join('') + '</span>');
+      } else {
+        parts.push(selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt'));
+        botSay('And the power? (or skip it)', '<span class="gc-widgets">' + parts.join('') + '</span>');
+      }
       var w2 = logEl.lastChild;
       var sels = w2.querySelectorAll('select.gc-sel');
-      sels[0].addEventListener('change', function () {
-        userSay(sels[0].options[sels[0].selectedIndex].text);
-        sel.style = sels[0].value;
-        proceed();
-      });
-      sels[1].addEventListener('change', function () {
-        sel.watt = sels[1].value;
-        userSay(sels[1].options[sels[1].selectedIndex].text);
-        proceed();
+      Array.prototype.forEach.call(sels, function (s) {
+        s.addEventListener('change', function () {
+          userSay(s.options[s.selectedIndex].text);
+          if (s.getAttribute('data-key') === 'style') sel.style = s.value; else sel.watt = s.value;
+          proceed();
+        });
       });
     }
     if (key === 'goal') {
@@ -1117,7 +1130,8 @@ function ccToggleTheme() {
     h += '</details>';
     d.innerHTML = h;
     logEl.appendChild(d);
-    scrollLog();
+    /* أظهر أعلى الجواب (بطاقات الأرقام) لا أسفله */
+    setTimeout(function () { d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
 
     d.querySelector('[data-gb-copy]').addEventListener('click', function () {
       var txt = copyText(food, g);
