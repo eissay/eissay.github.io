@@ -52,6 +52,8 @@ function ccToggleTheme() {
   padding: 4px 2px 10px;
   scroll-behavior: smooth;
 }
+/* حرِج: منع انكماش الفقاعات عند امتلاء السجل — وإلا «تنطوي» الجواب ويُقصّ محتواه */
+.gc-log > * { flex: 0 0 auto; }
 .gc-msg {
   max-width: 86%;
   padding: 10px 15px;
@@ -1130,8 +1132,12 @@ function ccToggleTheme() {
     h += '</details>';
     d.innerHTML = h;
     logEl.appendChild(d);
-    /* أظهر أعلى الجواب (بطاقات الأرقام) لا أسفله */
-    setTimeout(function () { d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+    /* مرّر داخل السجل فقط — بلا قفز الصفحة كلها (scrollIntoView كان يطوي الصفحة للأعلى) */
+    setTimeout(function () {
+      var top = d.offsetTop - logEl.offsetTop - 8;
+      if (logEl.scrollTo) logEl.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+      else logEl.scrollTop = Math.max(top, 0);
+    }, 60);
 
     d.querySelector('[data-gb-copy]').addEventListener('click', function () {
       var txt = copyText(food, g);
