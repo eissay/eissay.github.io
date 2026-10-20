@@ -102,6 +102,7 @@ function ccToggleTheme() {
 }
 .gc-set:hover { filter: brightness(1.07); }
 .gc-unitlbl { font: 500 13px var(--font-ui); color: var(--muted); }
+.gc-sel:disabled, .gc-num:disabled, .gc-set:disabled, .gc-opt:disabled { opacity: .5; cursor: default; }
 
 /* اقتراحات أثناء الكتابة */
 .gc-auto {
@@ -975,6 +976,13 @@ function ccToggleTheme() {
     });
   }
 
+  /* قفل عناصر الأسئلة السابقة — لا اختيارات يتيمة تُرسل رسائل شاردة بعد أن تقدم الدردشة */
+  function lockWidgets() {
+    Array.prototype.forEach.call(logEl.querySelectorAll('select.gc-sel, .gc-set, .gc-num, .gc-opt'), function (el) {
+      el.disabled = true;
+    });
+  }
+
   function applyAnswer(key, value) {
     pending = null; cand = null;
     if (key === 'state') sel.state = value;
@@ -991,6 +999,7 @@ function ccToggleTheme() {
 
   /* سؤال «أيُّها تقصد؟» — قائمة منسدلة + الكتابة مقبولة دائماً */
   function askCand() {
+    lockWidgets();
     var names = cand.map(function (f) { return f.name; }).join(', ');
     botSay('Which one? ' + esc(names) + ' - type it or pick:',
       '<span class="gc-widgets"><select class="gc-sel" data-key="cand"><option value="">Pick one…</option>' +
@@ -1010,6 +1019,7 @@ function ccToggleTheme() {
 
   function ask(key) {
     pending = key;
+    lockWidgets();
     if (key === 'food') {
       if (cand && cand.length) { askCand(); }
       else { botSay('What are you cooking? Type it - suggestions appear as you type.'); }
@@ -1038,24 +1048,28 @@ function ccToggleTheme() {
       });
     }
     if (key === 'fryer') {
-      /* النوع مطلوب؛ القدرة تُعرض معه وتبقى اختيارية (افتراضياً قياسية) */
-      var parts = [];
-      if (!sel.style) {
-        parts.push(selWidget([{ v: 'basket', l: 'Basket (drawer)' }, { v: 'oven', l: 'Oven-style' }], sel.style, 'style'));
-        parts.push(selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt'));
-        botSay('Which air fryer do you have? Type and power - power is optional.', '<span class="gc-widgets">' + parts.join('') + '</span>');
-      } else {
-        parts.push(selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt'));
-        botSay('And the power? (or skip it)', '<span class="gc-widgets">' + parts.join('') + '</span>');
-      }
+      /* اختيارات متعددة تُرسل معاً: النوع إلزامي والقدرة اختيارية — زر متابعة يرسل الاثنين دفعة واحدة */
+      var widgets = '<span class="gc-widgets">' +
+        selWidget([{ v: 'basket', l: 'Basket (drawer)' }, { v: 'oven', l: 'Oven-style' }], sel.style, 'style') +
+        selWidget([{ v: 'std', l: 'Standard power' }, { v: 'low', l: 'Compact (under 1000 W)' }, { v: 'high', l: 'High-power' }], sel.watt, 'watt') +
+        '<button class="gc-set" id="gc-fryset" type="button" disabled>Continue</button></span>';
+      botSay('Which air fryer do you have? Pick the type - power is optional.', widgets);
       var w2 = logEl.lastChild;
-      var sels = w2.querySelectorAll('select.gc-sel');
-      Array.prototype.forEach.call(sels, function (s) {
-        s.addEventListener('change', function () {
-          userSay(s.options[s.selectedIndex].text);
-          if (s.getAttribute('data-key') === 'style') sel.style = s.value; else sel.watt = s.value;
-          proceed();
-        });
+      var styleSel = w2.querySelector('select[data-key="style"]');
+      var wattSel = w2.querySelector('select[data-key="watt"]');
+      var fryBtn = w2.querySelector('#gc-fryset');
+      var refreshFry = function () { fryBtn.disabled = !styleSel.value; };
+      styleSel.addEventListener('change', refreshFry);
+      wattSel.addEventListener('change', refreshFry);
+      fryBtn.addEventListener('click', function () {
+        if (!styleSel.value) return;
+        var said = [styleSel.options[styleSel.selectedIndex].text];
+        if (wattSel.value) said.push(wattSel.options[wattSel.selectedIndex].text);
+        userSay(said.join(' - '));
+        sel.style = styleSel.value;
+        sel.watt = wattSel.value || 'std';
+        fryBtn.disabled = true; styleSel.disabled = true; wattSel.disabled = true;
+        proceed();
       });
     }
     if (key === 'goal') {
@@ -1132,6 +1146,7 @@ function ccToggleTheme() {
   }
 
   function answerNow() {
+    lockWidgets();
     var food = sel.food;
     var notes = [];
     /* استقلالية كاملة: تبديلات داخلية حتمية فقط */
