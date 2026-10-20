@@ -152,6 +152,58 @@ function ccToggleTheme() {
 .gc-hint { margin: 8px 2px 0; font: 500 12.5px var(--font-ui); color: var(--muted); }
 .gc-hint b { color: var(--gold-deep); font-weight: 600; }
 
+/* ترويسة الدردشة + زر التبديل بين الوضعين */
+.gc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 2px 12px; }
+.gc-title { font: 600 13px var(--font-ui); color: var(--muted); display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.gc-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 4px var(--gold-soft); animation: gcpulse 2.4s ease-in-out infinite; flex: 0 0 auto; }
+@keyframes gcpulse { 50% { box-shadow: 0 0 0 7px rgba(247, 208, 96, .12); } }
+.gc-mode {
+  background: var(--bg-2);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: 600 12.5px var(--font-ui);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.gc-mode:hover { border-color: var(--gold-deep); color: var(--gold); background: var(--gold-soft); }
+
+/* الوضع الكبير — الشات بوت */
+#gc-veil {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 7, 5, .55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease;
+  z-index: 88;
+}
+#gc-veil.on { opacity: 1; pointer-events: auto; }
+.gc.gc-big {
+  position: fixed;
+  z-index: 90;
+  top: max(2vh, 14px);
+  bottom: max(2vh, 14px);
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: min(880px, 94vw);
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55), var(--glow);
+  animation: gcPop .24s ease;
+}
+.gc.gc-big .gc-log { flex: 1 1 auto; min-height: 0; max-height: none; }
+.gc.gc-big .gc-msg { max-width: 78%; }
+.gc.gc-big .gc-answer { max-width: 100%; }
+.gc.gc-big .gc-head { padding: 2px 2px 14px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+@keyframes gcPop { from { opacity: 0; transform: translateX(-50%) translateY(16px) scale(.97); } }
+
 /* فقاعة الجواب */
 .gc-answer {
   max-width: 100%;
@@ -288,7 +340,10 @@ function ccToggleTheme() {
   .gc-log { max-height: 420px; }
 }
 @media print {
-  .gc-log, .gc-inputrow, .gc-hint { display: none !important; }
+  .gc-head, .gc-inputrow, .gc-auto, .gc-hint, .gc-msg:not(.gc-answer), #gc-veil { display: none !important; }
+  .gc { box-shadow: none; border: 0; padding: 0; }
+  .gc.gc-big { position: static !important; top: auto; bottom: auto; left: auto; width: auto; transform: none; animation: none; }
+  .gc-log { max-height: none; overflow: visible; }
   .gc-answer { box-shadow: none; border: 1px solid #999; }
   .gc-actions, .gb-copy-toast { display: none !important; }
 }
@@ -1204,6 +1259,7 @@ function ccToggleTheme() {
     if (auto) auto.hidden = true;
     if (!u) return;
     inEl.value = u.f.name;
+    autoExpand();
     handleTurn(u.f.name);
   }
 
@@ -1340,14 +1396,41 @@ function ccToggleTheme() {
     return true;
   }
 
+  /* ═══ الوضعان: مدمج ↔ شات بوت كبير ═══ */
+
+  var bigAutoDone = false;
+  function isBig() { var g = $('gc'); return !!(g && g.classList.contains('gc-big')); }
+  function setBig(on) {
+    var g = $('gc'), veil = $('gc-veil'), btn = $('gc-mode');
+    if (!g) return;
+    g.classList.toggle('gc-big', on);
+    if (veil) veil.classList.toggle('on', on);
+    if (btn) { btn.textContent = on ? 'Exit full view' : 'Full view'; btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    try { document.body.style.overflow = on ? 'hidden' : ''; } catch (e) {}
+    if (on && inEl) inEl.focus();
+    if (!on && logEl) scrollLog();
+  }
+  function autoExpand() {
+    /* مرة واحدة لكل زيارة: أول كتابة/لصق/إرسال يفتح الوضع الكبير، وبعدها التبديل يدوي فقط */
+    if (bigAutoDone || isBig()) return;
+    bigAutoDone = true;
+    setBig(true);
+  }
+
   function boot(data) {
     DATA = data;
     DATA.foodsById = {};
     for (var i = 0; i < DATA.foods.length; i++) DATA.foodsById[DATA.foods[i].id] = DATA.foods[i];
     buildIndex();
+    var veil = document.createElement('div');
+    veil.id = 'gc-veil';
+    veil.addEventListener('click', function () { setBig(false); });
+    document.body.appendChild(veil);
     var host = $('gb');
     host.innerHTML =
       '<div class="gc" id="gc">' +
+      '<div class="gc-head"><span class="gc-title"><span class="gc-dot"></span>Crisp Chef - your air fryer calculator</span>' +
+      '<button class="gc-mode" id="gc-mode" type="button" aria-pressed="false">Full view</button></div>' +
       '<div class="gc-log" id="gc-log" aria-live="polite"></div>' +
       '<div class="gc-inputrow">' +
       '<input class="gc-in" id="gc-in" type="text" autocomplete="off" placeholder="Type what you\u2019re cooking: wings, fries, salmon\u2026" aria-label="Type your food or answer">' +
@@ -1358,16 +1441,17 @@ function ccToggleTheme() {
       '</div>';
     logEl = $('gc-log'); inEl = $('gc-in');
     botSay('What are you cooking? Start typing - suggestions appear as you type. Or say it all at once and I will answer straight away.');
+    $('gc-mode').addEventListener('click', function () { setBig(!isBig()); });
     $('gc-send').addEventListener('click', function () {
       var v = inEl.value.trim();
-      if (v) handleTurn(v);
+      if (v) { autoExpand(); handleTurn(v); }
     });
     inEl.addEventListener('keydown', function (ev) {
       var auto = $('gc-auto');
       if (ev.key === 'Enter') {
         if (auto && !auto.hidden && autoIdx >= 0) { pickAuto(autoIdx); return; }
         var v = inEl.value.trim();
-        if (v) { handleTurn(v); inEl.value = ''; }
+        if (v) { autoExpand(); handleTurn(v); inEl.value = ''; }
         $('gc-auto').hidden = true;
       } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
         if (!auto || auto.hidden) return;
@@ -1377,10 +1461,20 @@ function ccToggleTheme() {
           b.classList.toggle('hl', i === autoIdx);
         });
       } else if (ev.key === 'Escape') {
-        if (auto) auto.hidden = true;
+        if (auto && !auto.hidden) { auto.hidden = true; ev.stopPropagation(); }
+        else if (isBig()) setBig(false);
       }
     });
-    inEl.addEventListener('input', renderAuto);
+    inEl.addEventListener('input', function () {
+      renderAuto();
+      if (inEl.value.trim().length > 0) autoExpand();
+    });
+    inEl.addEventListener('paste', function () {
+      setTimeout(function () { if (inEl.value.trim().length > 0) autoExpand(); }, 0);
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && isBig()) setBig(false);
+    });
     if (!applyUrl()) inEl.focus();
   }
 
