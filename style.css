@@ -808,6 +808,58 @@ figcaption { font-size: 13.5px; color: var(--muted); text-align: center; margin-
 .cookmode .cooknote { text-align: center; color: var(--muted); font-size: 13px; margin: 16px 0 0; }
 body.cooking { overflow: hidden; }
 
+/* ── وضع المطبخ ثلاثي الأبعاد (Crisp Kitchen 3D) ── */
+/* تصميم Chunky/Clay دافئ على هوية Warm Bakery — يملأ الشاشة فوق النص */
+.cookmode.cook3d-on .cook-inner, .cookmode.cook3d-on .cooknote { display: none; }
+.cookmode.cook3d-on { overflow: hidden; display: flex; flex-direction: column; }
+.cookmode .btn3d {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--on-accent) !important;
+  letter-spacing: .04em;
+}
+.cook3d-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cook3d-stage { flex: 1; min-height: 0; position: relative; touch-action: none; background: #fdf3dd; }
+.cook3d-stage canvas { display: block; width: 100%; height: 100%; }
+.cook3d-loading {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font: 600 16px var(--font-ui); color: #8a6a48; background: #fdf3dd;
+}
+.cook3d-hud {
+  background: #0f0b08;
+  color: #fff;
+  padding: 12px 18px calc(14px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 4px;
+}
+.cook3d-hud .cook3d-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cook3d-hud .cook3d-title { font: 700 17px var(--font-ui); }
+.cook3d-hud .cook3d-chip {
+  align-self: flex-start;
+  font: 700 12.5px var(--font-ui);
+  color: #16110d;
+  background: #f7d060;
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+.cook3d-hud .cook3d-tip { margin: 0; font: 400 13.5px/1.5 var(--font-ui); color: rgba(255,255,255,.78); }
+.cook3d-hud .cook3d-shake {
+  background: #f7d060;
+  color: #16110d;
+  border: 2px solid #16110d;
+  border-radius: 14px;
+  padding: 8px 16px;
+  font: 800 14px var(--font-ui);
+  cursor: pointer;
+  box-shadow: 0 3px 0 #16110d;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+.cook3d-hud .cook3d-shake:active { transform: translateY(2px); box-shadow: 0 1px 0 #16110d; }
+@media (max-width: 640px) {
+  .cook3d-hud .cook3d-title { font-size: 15px; }
+  .cook3d-hud .cook3d-tip { font-size: 12.5px; }
+  .cookmode .cookbar button { padding: 7px 12px; font-size: 13px; }
+}
+
 /* ── الحاسبة ── */
 .afconv {
   background: linear-gradient(150deg, var(--bg-2), var(--bg-1));
