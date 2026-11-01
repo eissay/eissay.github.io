@@ -1168,6 +1168,8 @@ function ccToggleTheme() {
     }
     var g = compute(food, sel.state, sel.qty, sel);
     pending = null; cand = null;
+    /* مرحلة في رحلة الزائر: تُربط بتسجيل الجلسة إن وافق الزائر */
+    if (window.ccTrack) window.ccTrack('guide_answer', { food: food.id, state: sel.state, goal: sel.goal || null });
 
     var d = document.createElement('div');
     d.className = 'gc-msg gc-answer';
